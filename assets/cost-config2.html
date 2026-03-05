@@ -1,0 +1,4453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算子成本配置系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        
+        h2 {
+            font-size: 18px;
+            color: #333;
+            margin: 20px 0 15px 0;
+            border-bottom: 2px solid #1890ff;
+            padding-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: #1890ff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ============ 算子列表页 ============ */
+        .operator-list-page {
+            display: none;
+        }
+        
+        .operator-list-page.active {
+            display: block;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #1890ff;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0050b3;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #d9d9d9;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: #fff;
+        }
+        
+        .btn-danger:hover {
+            background-color: #cf1322;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .search-box {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        thead {
+            background-color: #fafafa;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        tbody tr:hover {
+            background-color: #fafafa;
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* ============ 成本配置页 ============ */
+        .config-page {
+            display: none;
+        }
+        
+        .config-page.active {
+            display: block;
+        }
+        
+        .config-tabs {
+            display: flex;
+            gap: 0;
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .config-section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .param-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .param-item {
+            border: 1px solid #d9d9d9;
+            padding: 12px;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        
+        .param-item label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .param-item input,
+        .param-item select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .param-values {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .param-tag {
+            background-color: #1890ff;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .param-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .add-param-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            background-color: #fff;
+            border: 1px dashed #1890ff;
+            color: #1890ff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .sku-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .sku-table thead {
+            background-color: #fafafa;
+        }
+        
+        .sku-table th,
+        .sku-table td {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        
+        .sku-table th {
+            font-weight: 600;
+            background-color: #fafafa;
+        }
+        
+        .sku-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .sku-name {
+            font-family: monospace;
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .sku-edit-btn {
+            color: #1890ff;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 12px;
+        }
+        
+        .sku-edit-btn:hover {
+            color: #0050b3;
+        }
+        
+        .sku-delete-btn {
+            color: #ff4d4f;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 12px;
+        }
+        
+        .sku-delete-btn:hover {
+            color: #cf1322;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        /* ============ 模态框 ============ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 3px 6px -4px rgba(0,0,0,0.1), 0 6px 16px 0 rgba(0,0,0,0.08);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        /* ============ 批量操作 ============ */
+        .batch-discount-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .batch-discount-form .form-group {
+            grid-template-columns: 1fr;
+            margin: 0;
+        }
+        
+        .batch-discount-form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .batch-discount-form input,
+        .batch-discount-form select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        
+        .info-msg {
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #0050b3;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .success-msg {
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #274e2b;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        /* ============ 生成SKU ============ */
+        .generate-sku-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .sku-preview {
+            border: 1px solid #d9d9d9;
+            padding: 12px;
+            border-radius: 4px;
+            background-color: #fafafa;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        
+        .sku-preview-item {
+            padding: 6px;
+            margin-bottom: 6px;
+            background-color: #fff;
+            border-radius: 2px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .sku-preview-item code {
+            font-family: monospace;
+            color: #1890ff;
+        }
+        
+        /* ============ 响应式 ============ */
+        @media (max-width: 1024px) {
+            .param-config {
+                grid-template-columns: 1fr;
+            }
+            
+            .generate-sku-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .batch-discount-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group label {
+                margin-bottom: 4px;
+            }
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group button {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
+        .input-group button {
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .input-group button:hover {
+            background-color: #0050b3;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .editable-cell {
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+        }
+
+        .editable-cell:hover {
+            background-color: #e6f7ff;
+        }
+
+        .cost-table tbody td input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ============ 算子列表页 ============ -->
+        <div class="operator-list-page active">
+            <header>
+                <h1>算子成本配置系统</h1>
+                <p style="color: #666; margin-top: 5px; font-size: 14px;">管理各算子的成本参数和定价信息</p>
+            </header>
+            
+            <div class="toolbar">
+                <div class="search-box">
+                    <input id="operatorSearchInput" type="text" placeholder="搜索算子名称..." oninput="renderOperatorList()">
+                    <button class="btn btn-secondary" onclick="renderOperatorList()">搜索</button>
+                </div>
+                <button class="btn btn-secondary" onclick="openGlobalBatchDiscountModal()">全局批量折扣</button>
+                <button class="btn btn-primary" onclick="openImportModal()">批量导入</button>
+                <button class="btn btn-secondary" onclick="exportData()">批量导出</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>算子名称</th>
+                        <th>英文标识</th>
+                        <th>描述</th>
+                        <th>SKU数量</th>
+                        <th>最后修改</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="operatorTableBody"></tbody>
+            </table>
+        </div>
+        
+        <!-- ============ 成本配置页 ============ -->
+        <div class="config-page">
+            <div class="breadcrumb">
+                <a onclick="goBackToList()">算子列表</a>
+                <span> / </span>
+                <span id="operatorName">可灵图生视频</span>
+            </div>
+            
+            <header>
+                <h1 id="configTitle">可灵图生视频 - 成本配置</h1>
+            </header>
+            
+            <div class="config-tabs">
+                <div class="tab active" onclick="switchTab(this, 'auto-sku')">自动生成SKU</div>
+                <div class="tab" onclick="switchTab(this, 'custom-sku')">自定义SKU</div>
+                <div class="tab" onclick="switchTab(this, 'cost-unit')">成本单位配置</div>
+                <div class="tab" onclick="switchTab(this, 'batch-ops')">批量操作</div>
+            </div>
+            
+            <!-- ============ 自动生成SKU ============ -->
+            <div id="auto-sku" class="tab-content active">
+                <div class="config-section">
+                    <h2>第一步：选择参数</h2>
+                    
+                    <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                        从可用参数列表中选择需要参与SKU组合的参数，系统将根据选中参数的所有枚举值进行排列组合
+                    </p>
+                    
+                    <div class="available-params">
+                        <!-- 动态生成的参数选择 -->
+                    </div>
+
+                    <h2 style="margin-top: 30px;">快捷批量输入（可选）</h2>
+
+                    <p style="color: #666; margin-bottom: 10px; font-size: 13px;">
+                        一次性输入多个参数及其取值，系统会自动勾选参数并覆盖对应取值。格式示例：<br>
+                        <code>model=kling-2.5,kling-2.6</code><br>
+                        <code>resolution=1080p,2k,4k</code><br>
+                        <code>mode=std,pro</code><br>
+                        <code>audio=true,false</code>
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start;">
+                        <textarea id="bulkParamInput" style="width: 100%; min-height: 110px; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; resize: vertical;" placeholder="粘贴/输入参数=值1,值2... (一行一个参数)"></textarea>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="applyBulkParamInput()">应用批量输入</button>
+                            <button class="btn btn-secondary" onclick="clearBulkParamInput()">清空</button>
+                        </div>
+                    </div>
+                    
+                    <h2 style="margin-top: 30px;">第二步：配置参数值</h2>
+                    
+                    <div id="selectedParamsConfig" class="param-config">
+                        <!-- 动态生成的参数配置 -->
+                    </div>
+                    
+                    <div class="info-msg" id="skuCountInfo">
+                        ℹ️ 预计生成 <strong>6</strong> 个SKU (3个分辨率 × 2个模式)
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetParams()">重置</button>
+                        <button class="btn btn-primary" onclick="previewGenerateSKUs()">预生成SKU</button>
+                    </div>
+                </div>
+                
+                <!-- 预生成SKU预览区域 -->
+                <div id="skuPreviewSection" class="config-section" style="display: none; margin-top: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                        <h2 style="margin: 0;">预生成SKU预览</h2>
+                        <button class="btn btn-secondary btn-small" onclick="toggleSKUPreview()">收起</button>
+                    </div>
+                    
+                    <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                        预览将要生成的SKU，可以对每一条进行编辑、删除操作。确认后会添加到正式的SKU列表中。
+                    </p>
+                    
+                    <div id="previewSKUContainer" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                        <!-- 预生成的SKU项会动态插入到这里 -->
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="cancelSKUPreview()">取消</button>
+                        <button class="btn btn-primary" onclick="confirmGenerateSKUs()">确认并添加</button>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h2>已生成的SKU列表</h2>
+
+                    <div id="autoSkuTableContainer"></div>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="saveDraft()">保存为草稿</button>
+                        <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ============ 自定义SKU ============ -->
+            <div id="custom-sku" class="tab-content">
+                <div class="config-section">
+                    <h2>自定义SKU配置</h2>
+                    
+                    <p style="color: #666; margin-bottom: 20px; font-size: 13px;">
+                        用于配置无法通过参数排列组合生成的特殊成本信息
+                    </p>
+                    
+                    <button class="btn btn-primary" onclick="openAddCustomSKUModal()">+ 新增自定义SKU</button>
+                    
+                    <table class="sku-table" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">SKU名称</th>
+                                <th>描述</th>
+                                <th>备注</th>
+                                <th style="width: 100px;">刊例价</th>
+                                <th style="width: 60px;">折扣</th>
+                                <th style="width: 100px;">折扣价</th>
+                                <th style="width: 100px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customSkuTbody"></tbody>
+                    </table>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="saveDraft()">保存为草稿</button>
+                        <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ============ 成本单位配置 ============ -->
+            <div id="cost-unit" class="tab-content">
+                <div class="config-section">
+                    <h2>成本单位配置</h2>
+                    
+                    <div class="form-group">
+                        <label>计费单位</label>
+                        <select id="billingUnitSelect" style="width: 200px; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;" onchange="onBillingUnitChanged(this.value)">
+                            <option value="times" selected>次数</option>
+                            <option value="seconds">时长 (秒)</option>
+                            <option value="chars">字符数</option>
+                            <option value="tokens">Token数</option>
+                            <option value="sentences">句数</option>
+                            <option value="pages">文档页数</option>
+                        </select>
+                    </div>
+
+                    <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 15px;">入参/出参参数组合（批量生成）</h3>
+                    <p style="color: #666; margin-bottom: 10px; font-size: 13px;">
+                        用于“按入参/出参 key:value 组合生成多条 SKU”，并以表格方式批量编辑成本（不需要一条条新增）。
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: start; margin-bottom: 15px;">
+                        <div>
+                            <label style="display:block; font-weight:600; margin-bottom:6px;">入参（每行一个：key=值1,值2...）</label>
+                            <textarea id="unitInParamsInput" style="width:100%; min-height:110px; padding:10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; resize:vertical;" placeholder="video_length=0-300,>300\nmodel=kling-2.6"></textarea>
+                        </div>
+                        <div>
+                            <label style="display:block; font-weight:600; margin-bottom:6px;">出参（每行一个：key=值1,值2...）</label>
+                            <textarea id="unitOutParamsInput" style="width:100%; min-height:110px; padding:10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; resize:vertical;" placeholder="format_code=1080p,2k,4k\nactual_duration=5,10"></textarea>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <button class="btn btn-secondary" onclick="generateUnitRowsFromParams()">生成组合行</button>
+                            <button class="btn btn-secondary" onclick="addEmptyUnitRow()">+ 手动加一行</button>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 15px;">参数组合成本表</h3>
+                    
+                    <table class="cost-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">SKU名称</th>
+                                <th>入参 (key=value)</th>
+                                <th>出参 (key=value)</th>
+                                <th style="width: 120px;">刊例价 (元/单位)</th>
+                                <th style="width: 90px;">折扣 (%)</th>
+                                <th style="width: 120px;">折扣价</th>
+                                <th style="width: 180px;">备注</th>
+                                <th style="width: 80px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="unitSkuTbody"></tbody>
+                    </table>
+                    
+                    <button class="btn btn-secondary" style="margin-top: 15px;" onclick="addEmptyUnitRow()">+ 添加参数组合</button>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="saveDraft()">保存为草稿</button>
+                        <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ============ 批量操作 ============ -->
+            <div id="batch-ops" class="tab-content">
+                <div class="config-section">
+                    <h2>批量调整折扣</h2>
+                    
+                    <p style="color: #666; margin-bottom: 20px; font-size: 13px;">
+                        根据模型、分辨率等条件批量调整所有匹配的SKU的折扣比例
+                    </p>
+                    
+                    <div class="batch-discount-form">
+                        <div class="form-group">
+                            <label>范围</label>
+                            <select id="batchScopeSelect" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                <option value="current" selected>当前算子</option>
+                                <option value="vendor">厂商（同厂商）</option>
+                                <option value="all">所有算子</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>SKU类型</label>
+                            <select id="batchSkuTypeSelect" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                <option value="all" selected>全部</option>
+                                <option value="auto">自动SKU</option>
+                                <option value="custom">自定义SKU</option>
+                                <option value="unit">单位成本SKU</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>新折扣 (%)</label>
+                            <div class="input-group" style="margin: 0;">
+                                <input id="batchNewDiscountInput" type="number" placeholder="如：80" min="0" max="100" value="">
+                                <span>%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="grid-template-columns: 1fr; margin-bottom: 15px;">
+                        <label>筛选条件（可选，AND 关系）</label>
+                        <div id="batchFiltersContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                        <div style="display:flex; gap:10px; margin-top: 10px;">
+                            <button class="btn btn-secondary btn-small" onclick="addBatchFilterRow('batch')">+ 添加筛选条件</button>
+                            <button class="btn btn-secondary btn-small" onclick="clearBatchFilters('batch')">清空</button>
+                        </div>
+                        <div style="color:#999; font-size:12px; margin-top:6px;">提示：每条筛选为 key=值；多条条件同时满足才匹配。</div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="showBatchPreview()">预览更改</button>
+                    
+                    <div id="batchPreview" style="display: none; margin-top: 20px;">
+                        <div id="batchPreviewMsg" class="info-msg"></div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="confirmBatchDiscount()">确认更改</button>
+                            <button class="btn btn-secondary" onclick="cancelBatchDiscount()">取消</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h2>批量导入 / 导出</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h3 style="font-size: 14px; margin-bottom: 10px;">批量导入</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 10px;">
+                                支持 Excel、CSV 文件导入，系统将自动合并或覆盖现有配置
+                            </p>
+                            <button class="btn btn-secondary" onclick="openImportModal()">选择文件导入</button>
+                        </div>
+                        
+                        <div>
+                            <h3 style="font-size: 14px; margin-bottom: 10px;">批量导出</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 10px;">
+                                将当前算子的所有SKU和成本配置导出为 Excel 文件
+                            </p>
+                            <button class="btn btn-secondary" onclick="exportOperatorData()">导出为 Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - 编辑SKU ============ -->
+    <div id="editSKUModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>编辑SKU</h3>
+                <button class="modal-close" onclick="closeEditSKUModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 14px;">SKU标识</h4>
+                    <p style="margin: 0; font-family: monospace; color: #1890ff; font-weight: 600;" id="editSKUId"></p>
+                </div>
+                
+                <div id="editSKUParamsContainer" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">参数信息</h4>
+                    <div id="editSKUParams" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <!-- 参数字段将动态插入 -->
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">成本信息</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                            <label style="font-weight: 600; margin-bottom: 6px;">刊例价 (元)</label>
+                            <input type="number" step="0.01" id="editSKUPrice" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;" onchange="calculateEditSKUDiscountPrice()">
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                            <label style="font-weight: 600; margin-bottom: 6px;">折扣 (%)</label>
+                            <input type="number" id="editSKUDiscount" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;" onchange="calculateEditSKUDiscountPrice()">
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                            <label style="font-weight: 600; margin-bottom: 6px;">折扣价 (元)</label>
+                            <input type="text" id="editSKUDiscountPrice" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; background-color: #f5f5f5;" disabled>
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                            <label style="font-weight: 600; margin-bottom: 6px;">倍数</label>
+                            <input type="number" step="0.01" id="editSKUMultiplier" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">备注信息</h4>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                        <label style="font-weight: 600; margin-bottom: 6px;">备注</label>
+                        <textarea id="editSKURemark" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; resize: vertical; min-height: 80px;" placeholder="添加备注信息..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditSKUModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveEditedSKU()">保存修改</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - SKU预览 ============ -->
+    <div id="skuPreviewModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>预生成SKU预览</h3>
+                <button class="modal-close" onclick="closeSKUPreviewModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                    预览将要生成的SKU列表，可以对每一行进行编辑、删除操作。确认后会添加到正式的SKU列表中。
+                </p>
+                
+                <div style="overflow-x: auto; max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px;">
+                    <table class="sku-table" style="margin: 0;">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">SKU名称</th>
+                                <th id="previewParamHeaders"></th>
+                                <th style="width: 100px;">刊例价</th>
+                                <th style="width: 80px;">折扣</th>
+                                <th style="width: 100px;">折扣价</th>
+                                <th style="width: 200px;">备注</th>
+                                <th style="width: 80px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewSKUTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;">
+                    <p style="color: #666; font-size: 12px; margin: 0;">
+                        预计生成 <strong id="previewSKUCount">0</strong> 个SKU
+                    </p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSKUPreviewModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmGenerateSKUs()">确认并添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - 新增自定义参数 ============ -->
+    <div id="customParamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增自定义参数</h3>
+                <button class="modal-close" onclick="closeCustomParamModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                    创建自定义参数来处理复杂的表达式，如数组长度判断、大小比较、结构体取值等
+                </p>
+                
+                <div class="form-group">
+                    <label>参数名称</label>
+                    <input type="text" id="customParamName" placeholder="如：输出时长">
+                </div>
+                
+                <div class="form-group">
+                    <label>英文标识</label>
+                    <input type="text" id="customParamKey" placeholder="如：output_duration">
+                </div>
+                
+                <div class="form-group">
+                    <label>表达式类型</label>
+                    <select id="customParamType" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; width: 100%;">
+                        <option value="length">数组长度</option>
+                        <option value="comparison">大小比较</option>
+                        <option value="property">属性取值</option>
+                        <option value="custom">自定义表达式</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>表达式</label>
+                    <textarea id="customParamExpr" placeholder="示例：arr.length > 5&#10;示例：item.size == 'large'&#10;示例：output.video.duration&#10;支持JavaScript表达式"></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCustomParamModal()">取消</button>
+                <button class="btn btn-primary" onclick="addCustomParam()">添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - 新增/编辑自定义SKU ============ -->
+    <div id="customSKUModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customSkuModalTitle">新增自定义SKU</h3>
+                <button class="modal-close" onclick="closeCustomSKUModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <input type="hidden" id="customSkuId">
+                <div class="form-group">
+                    <label>SKU英文名称</label>
+                    <input type="text" id="customSkuName" placeholder="自动生成，如：sku_custom_003">
+                </div>
+                
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" id="customSkuDesc" placeholder="简要描述此SKU的用途，如：长视频优惠价">
+                </div>
+                
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="customSkuRemark" placeholder="添加详细备注，如：适用于5分钟以上的长视频生成..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>刊例价 (元)</label>
+                    <input id="customSkuListPrice" type="number" step="0.0001" placeholder="输入刊例价，如：5.00">
+                </div>
+                
+                <div class="form-group">
+                    <label>折扣比例 (%)</label>
+                    <input id="customSkuDiscount" type="number" placeholder="输入折扣，如：80" value="100" min="0" max="100">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCustomSKUModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveCustomSKUFromModal()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - 批量导入 ============ -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入配置</h3>
+                <button class="modal-close" onclick="closeImportModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                    支持导入 JSON、CSV 格式的文件。系统将自动识别文件结构并匹配相应的算子。
+                </p>
+
+                <input id="importFileInput" type="file" accept=".json,.csv" style="display:none" onchange="handleImportFileSelected(this.files)">
+                
+                <div style="border: 2px dashed #d9d9d9; padding: 30px; text-align: center; border-radius: 4px; background-color: #fafafa; cursor: pointer; margin-bottom: 15px;"
+                     onclick="document.getElementById('importFileInput').click()"
+                     ondrop="handleFileDrop(event)" ondragover="event.preventDefault()" ondragleave="event.preventDefault()">
+                    <div style="font-size: 18px; margin-bottom: 8px;">📁</div>
+                    <p style="color: #666; margin: 0;">拖放文件至此处或 <a href="#" style="color: #1890ff; text-decoration: none;" onclick="event.preventDefault(); document.getElementById('importFileInput').click();">点击选择</a></p>
+                    <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">支持的格式: .json, .csv（Excel 可直接打开 CSV）</p>
+                </div>
+                
+                <h4 style="font-size: 13px; margin: 15px 0 10px 0;">导入选项</h4>
+                
+                <div style="display: flex; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="importType" value="merge" checked>
+                        <span style="font-size: 13px;">合并现有配置（相同SKU则覆盖）</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="importType" value="replace">
+                        <span style="font-size: 13px;">完全替换配置</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 模态框 - 全局批量折扣 ============ -->
+    <div id="globalBatchDiscountModal" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3>全局批量折扣</h3>
+                <button class="modal-close" onclick="closeGlobalBatchDiscountModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:#666; margin-bottom: 15px; font-size: 13px;">
+                    对所有算子生效：按字段筛选 SKU 并批量调整折扣。
+                </p>
+
+                <div class="batch-discount-form">
+                    <div class="form-group">
+                        <label>SKU类型</label>
+                        <select id="globalBatchSkuTypeSelect" style="padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                            <option value="all" selected>全部</option>
+                            <option value="auto">自动SKU</option>
+                            <option value="custom">自定义SKU</option>
+                            <option value="unit">单位成本SKU</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-template-columns: 1fr;">
+                        <label>筛选条件（可选，AND 关系）</label>
+                        <div id="globalBatchFiltersContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                        <div style="display:flex; gap:10px; margin-top: 10px;">
+                            <button class="btn btn-secondary btn-small" onclick="addBatchFilterRow('global')">+ 添加筛选条件</button>
+                            <button class="btn btn-secondary btn-small" onclick="clearBatchFilters('global')">清空</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="grid-template-columns: 1fr;">
+                    <label>新折扣 (%)</label>
+                    <div class="input-group" style="margin: 0;">
+                        <input id="globalBatchNewDiscountInput" type="number" placeholder="如：80" min="0" max="100">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showGlobalBatchPreview()">预览更改</button>
+                <div id="globalBatchPreview" style="display:none; margin-top: 15px;">
+                    <div id="globalBatchPreviewMsg" class="info-msg"></div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-primary" onclick="confirmGlobalBatchDiscount()">确认更改</button>
+                        <button class="btn btn-secondary" onclick="cancelGlobalBatchDiscount()">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ 模态框 - 预览 ============ -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>SKU配置预览</h3>
+                <button class="modal-close" onclick="closePreviewModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <table class="sku-table">
+                    <thead>
+                        <tr>
+                            <th>SKU名称</th>
+                            <th>参数配置</th>
+                            <th>刊例价</th>
+                            <th>折扣</th>
+                            <th>折扣价</th>
+                        </tr>
+                    </thead>
+                    <tbody id="previewTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* LEGACY PROTOTYPE (disabled)
+        // 参数定义 - 分为入参、出参、自定义参数三个分类
+        const parameterDefinitions = {
+            input: {
+                category: '入参',
+                params: {
+                    model: {
+                        name: '模型',
+                        values: ['kling-2.5', 'kling-2.6']
+                    },
+                    resolution: {
+                        name: '分辨率',
+                        values: ['1080p', '2k', '4k']
+                    },
+                    mode: {
+                        name: '模式',
+                        values: ['std', 'pro']
+                    }
+                }
+            },
+            output: {
+                category: '出参',
+                params: {
+                    actual_duration: {
+                        name: '实际视频时长',
+                        values: ['5秒', '10秒', '30秒']
+                    },
+                    output: {
+                        name: 'Output',
+                        values: ['standard', 'high_quality']
+                    }
+                }
+            },
+            custom: {
+                category: '自定义参数',
+                params: {}
+            }
+        };
+        
+        // 获取参数定义的平铺结构（用于生成SKU）
+        function getFlatParamDefinitions() {
+            const flat = {};
+            for (const category in parameterDefinitions) {
+                const categoryDef = parameterDefinitions[category];
+                for (const paramKey in categoryDef.params) {
+                    flat[paramKey] = categoryDef.params[paramKey];
+                }
+            }
+            return flat;
+        }
+        
+        // 获取选中的参数
+        function getSelectedParams() {
+            const checkboxes = document.querySelectorAll('.param-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
+        // 获取参数的分类
+        function getParamCategory(paramKey) {
+            for (const category in parameterDefinitions) {
+                if (parameterDefinitions[category].params[paramKey]) {
+                    return category;
+                }
+            }
+            return null;
+        }
+        
+        // 获取参数的定义
+        function getParamDef(paramKey) {
+            const flatDefs = getFlatParamDefinitions();
+            return flatDefs[paramKey];
+        }
+        
+        // 渲染参数选择区域 - 支持入参、出参、自定义参数三个分类
+        function renderParamSelection() {
+            const container = document.querySelector('.available-params');
+            let html = '';
+            
+            for (const categoryKey in parameterDefinitions) {
+                const category = parameterDefinitions[categoryKey];
+                const params = category.params;
+                
+                if (Object.keys(params).length === 0 && categoryKey === 'custom') {
+                    // 自定义参数区域
+                    html += `
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <h3 style="font-size: 14px; margin-bottom: 10px; font-weight: 600;">自定义参数</h3>
+                            <button class="btn btn-secondary btn-small" onclick="openAddCustomParamModal()" style="margin-bottom: 15px;">+ 新增自定义参数</button>
+                            <div id="customParamsContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                                <p style="color: #999; font-size: 12px;">暂无自定义参数，点击上方按钮添加</p>
+                            </div>
+                        </div>
+                    `;
+                } else if (Object.keys(params).length > 0) {
+                    html += `
+                        <h3 style="font-size: 14px; margin: 15px 0 10px 0; font-weight: 600;">${category.category}</h3>
+                    `;
+                    
+                    for (const paramKey in params) {
+                        const param = params[paramKey];
+                        const valueCount = param.values ? param.values.length : 0;
+                        html += `
+                            <label style="display: flex; align-items: center; gap: 8px; padding: 10px; background-color: #fafafa; margin-bottom: 10px; border-radius: 4px; cursor: pointer;">
+                                <input type="checkbox" class="param-checkbox" value="${paramKey}" onchange="onParamSelected()">
+                                <span style="font-weight: 600; flex: 1;">${param.name}</span>
+                                ${valueCount > 0 ? `<span style="color: #999; font-size: 12px;">${valueCount}个值</span>` : ''}
+                                ${param.type ? `<span style="color: #1890ff; font-size: 11px; background-color: #e6f7ff; padding: 2px 6px; border-radius: 2px;">${param.type}</span>` : ''}
+                            </label>
+                        `;
+                    }
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 渲染参数配置区域
+        function renderParamConfig(selectedParams) {
+            const container = document.getElementById('selectedParamsConfig');
+            
+            if (selectedParams.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-size: 13px;">请先选择至少一个参数</p>';
+                return;
+            }
+            
+            container.innerHTML = selectedParams.map(paramKey => {
+                const param = getParamDef(paramKey);
+                
+                // 对于自定义参数，显示表达式而不是枚举值
+                if (!param.values || param.values.length === 0) {
+                    return `
+                        <div class="param-item">
+                            <label>${param.name}</label>
+                            <div style="margin-top: 8px;">
+                                <div style="color: #666; font-size: 12px; margin-bottom: 8px; padding: 8px; background-color: #f5f5f5; border-radius: 3px; border-left: 3px solid #1890ff;">
+                                    <strong>表达式:</strong> ${param.expression || '(未配置)'}
+                                </div>
+                                <button class="add-param-btn" style="margin-top: 8px;" onclick="editCustomParamExpr('${paramKey}')">
+                                    编辑表达式
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 对于普通参数，显示枚举值
+                const valuesHtml = param.values.map(value => 
+                    `<div class="param-tag" data-param="${paramKey}" data-value="${value}">
+                        ${value} 
+                        <span class="remove" onclick="removeParamValue(this)">×</span>
+                    </div>`
+                ).join('');
+                
+                return `
+                    <div class="param-item">
+                        <label>${param.name}</label>
+                        <div style="margin-top: 8px;">
+                            <div style="color: #666; font-size: 12px; margin-bottom: 6px;">
+                                已选择 ${param.values.length} 个值
+                            </div>
+                            <div class="param-values">
+                                ${valuesHtml}
+                            </div>
+                            <button class="add-param-btn" style="margin-top: 8px;" onclick="addCustomParamValue('${paramKey}')">
+                                + 添加自定义值
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 参数选择改变时的处理
+        function onParamSelected() {
+            const selectedParams = getSelectedParams();
+            renderParamConfig(selectedParams);
+            calculateSKUCount(selectedParams);
+        }
+        
+        // 打开添加自定义参数模态框
+        function openAddCustomParamModal() {
+            document.getElementById('customParamModal').classList.add('show');
+        }
+        
+        // 关闭自定义参数模态框
+        function closeCustomParamModal() {
+            document.getElementById('customParamModal').classList.remove('show');
+        }
+        
+        // 添加自定义参数
+        function addCustomParam() {
+            const paramName = document.getElementById('customParamName').value.trim();
+            const paramKey = document.getElementById('customParamKey').value.trim();
+            const paramType = document.getElementById('customParamType').value;
+            const paramExpr = document.getElementById('customParamExpr').value.trim();
+            
+            if (!paramName || !paramKey) {
+                alert('参数名称和英文标识不能为空');
+                return;
+            }
+            
+            // 检查是否已存在
+            const flatDefs = getFlatParamDefinitions();
+            if (flatDefs[paramKey]) {
+                alert('该英文标识已存在，请修改');
+                return;
+            }
+            
+            // 添加自定义参数到定义中
+            parameterDefinitions.custom.params[paramKey] = {
+                name: paramName,
+                type: paramType,
+                expression: paramExpr,
+                values: [] // 自定义参数不需要枚举值
+            };
+            
+            // 重新渲染参数选择
+            renderParamSelection();
+            
+            // 清空表单
+            document.getElementById('customParamName').value = '';
+            document.getElementById('customParamKey').value = '';
+            document.getElementById('customParamType').value = 'length';
+            document.getElementById('customParamExpr').value = '';
+            
+            closeCustomParamModal();
+            alert('自定义参数添加成功');
+        }
+        
+        // 编辑自定义参数表达式
+        function editCustomParamExpr(paramKey) {
+            const param = getParamDef(paramKey);
+            const newExpr = prompt(`编辑"${param.name}"的表达式:`, param.expression);
+            
+            if (newExpr !== null) {
+                param.expression = newExpr;
+                renderParamConfig(getSelectedParams());
+            }
+        }
+        
+        // 添加自定义参数值
+        function addCustomParamValue(paramKey) {
+            const param = parameterDefinitions[paramKey];
+            const newValue = prompt(`为"${param.name}"添加新值:`);
+            
+            if (newValue && newValue.trim()) {
+                if (!param.values.includes(newValue.trim())) {
+                    param.values.push(newValue.trim());
+                    onParamSelected();
+                } else {
+                    alert('此值已存在');
+                }
+            }
+        }
+        
+        // 移除参数值
+        function removeParamValue(element) {
+            const tag = element.parentElement;
+            const paramKey = tag.getAttribute('data-param');
+            const value = tag.getAttribute('data-value');
+            const param = parameterDefinitions[paramKey];
+            
+            const index = param.values.indexOf(value);
+            if (index > -1) {
+                param.values.splice(index, 1);
+            }
+            
+            onParamSelected();
+        }
+        
+        // 计算SKU数量
+        function calculateSKUCount(selectedParams) {
+            if (selectedParams.length === 0) {
+                document.getElementById('skuCountInfo').innerHTML = 
+                    'ℹ️ 请先选择参数';
+                return;
+            }
+            
+            let count = 1;
+            const details = [];
+            
+            selectedParams.forEach(paramKey => {
+                const param = getParamDef(paramKey);
+                if (param.values && param.values.length > 0) {
+                    count *= param.values.length;
+                    details.push(`${param.values.length}个${param.name}`);
+                }
+            });
+            
+            const formula = selectedParams
+                .filter(paramKey => {
+                    const param = getParamDef(paramKey);
+                    return param.values && param.values.length > 0;
+                })
+                .map(paramKey => {
+                    const param = getParamDef(paramKey);
+                    return param.values.length;
+                })
+                .join(' × ');
+            
+            document.getElementById('skuCountInfo').innerHTML = 
+                `ℹ️ 预计生成 <strong>${count}</strong> 个SKU (${formula} = ${details.join(' × ')})`;
+        }
+        
+        // 生成SKU列表
+        function generateSKUs() {
+            const selectedParams = getSelectedParams();
+            
+            if (selectedParams.length === 0) {
+                alert('请先选择至少一个参数');
+                return;
+            }
+            
+            // 检查是否有参数值被删除为空
+            const hasEmptyParam = selectedParams.some(paramKey => {
+                const param = getParamDef(paramKey);
+                return param.values && param.values.length === 0;
+            });
+            
+            if (hasEmptyParam) {
+                alert('请确保所有参数都至少有一个值');
+                return;
+            }
+            
+            // 生成所有参数组合
+            const skus = generateParameterCombinations(selectedParams);
+            renderSKUTable(skus, selectedParams);
+        }
+        
+        // 预生成SKU - 展开预览区域
+        function previewGenerateSKUs() {
+            const selectedParams = getSelectedParams();
+            
+            if (selectedParams.length === 0) {
+                alert('请先选择至少一个参数');
+                return;
+            }
+            
+            // 检查是否有参数值被删除为空
+            const hasEmptyParam = selectedParams.some(paramKey => {
+                const param = getParamDef(paramKey);
+                return param.values && param.values.length === 0;
+            });
+            
+            if (hasEmptyParam) {
+                alert('请确保所有参数都至少有一个值');
+                return;
+            }
+            
+            // 生成所有参数组合
+            const skus = generateParameterCombinations(selectedParams);
+            
+            // 保存到全局变量，以便确认时使用
+            window.previewSKUs = skus;
+            window.previewSelectedParams = selectedParams;
+            
+            // 渲染预览区域
+            renderSKUPreviewSection(skus, selectedParams);
+            
+            // 显示预览区域
+            document.getElementById('skuPreviewSection').style.display = 'block';
+            
+            // 滚动到预览区域
+            document.getElementById('skuPreviewSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // 渲染SKU预览区域
+        function renderSKUPreviewSection(skus, selectedParams) {
+            const container = document.getElementById('previewSKUContainer');
+            container.innerHTML = '';
+            
+            skus.forEach((sku, index) => {
+                let paramHtml = '';
+                selectedParams.forEach(paramKey => {
+                    const paramValue = sku.params.find(p => p.key === paramKey);
+                    const param = getParamDef(paramKey);
+                    paramHtml += `<div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-weight: 600; min-width: 80px; color: #666;">${param.name}:</span>
+                        <span>${paramValue ? paramValue.value : '-'}</span>
+                    </div>`;
+                });
+                
+                const skuCard = document.createElement('div');
+                skuCard.className = 'sku-card';
+                skuCard.style.cssText = `
+                    border: 1px solid #d9d9d9;
+                    border-radius: 4px;
+                    padding: 15px;
+                    background-color: #fafafa;
+                `;
+                
+                skuCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="margin: 0; font-size: 14px; color: #333;">
+                            <span style="color: #1890ff; font-weight: 600;">${sku.id}</span>
+                            <span style="color: #999; font-weight: normal; margin-left: 8px;">预生成的SKU${index + 1}</span>
+                        </h4>
+                        <span class="sku-delete-btn" onclick="deletePreviewSKU(${index})" style="cursor: pointer;">删除</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 12px;">
+                        ${paramHtml}
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">刊例价</label>
+                            <input type="number" step="0.01" value="${sku.price}" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" class="preview-price" onchange="calculatePreviewDiscountPrice(this)">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">折扣 (%)</label>
+                            <input type="number" value="100" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" class="preview-discount" onchange="calculatePreviewDiscountPrice(this)">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">折扣价</label>
+                            <input type="text" value="${sku.discountPrice}" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" class="preview-discount-price" disabled>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">倍数</label>
+                            <input type="number" step="0.01" value="${sku.multiplier}" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" class="preview-multiplier" placeholder="1">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">备注</label>
+                            <input type="text" value="${sku.remark}" placeholder="备注..." style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" class="preview-remark">
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(skuCard);
+                
+                // 初始化计算折扣价
+                setTimeout(() => {
+                    const priceInput = skuCard.querySelector('.preview-price');
+                    calculatePreviewDiscountPrice(priceInput);
+                }, 0);
+            });
+            
+            // 更新预览区域的统计信息
+            const section = document.getElementById('skuPreviewSection');
+            let statsDiv = section.querySelector('.preview-stats');
+            if (!statsDiv) {
+                statsDiv = document.createElement('div');
+                statsDiv.className = 'preview-stats';
+                section.insertBefore(statsDiv, section.querySelector('#previewSKUContainer'));
+            }
+            
+            statsDiv.style.cssText = `
+                padding: 10px 12px;
+                background-color: #e6f7ff;
+                border-radius: 4px;
+                margin-bottom: 15px;
+                font-size: 13px;
+                color: #0050b3;
+            `;
+            statsDiv.innerHTML = `预计生成 <strong>${skus.length}</strong> 个SKU`;
+        }
+        
+        // 切换预览区域的显示/隐藏
+        function toggleSKUPreview() {
+            const section = document.getElementById('skuPreviewSection');
+            const button = event.target;
+            
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.textContent = '收起';
+            } else {
+                section.style.display = 'none';
+                button.textContent = '展开';
+            }
+        }
+        
+        // 计算预览表格中的折扣价
+        function calculatePreviewDiscountPrice(input) {
+            const row = input.closest('tr');
+            const priceInput = row.querySelector('.preview-price');
+            const discountInput = input;
+            const discountPriceInput = row.querySelector('.preview-discount-price');
+            
+            const price = parseFloat(priceInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 100;
+            const discountPrice = (price * discount / 100).toFixed(2);
+            
+            discountPriceInput.value = discountPrice;
+        }
+        
+        // 删除预览中的SKU
+        function deletePreviewSKU(index) {
+            if (confirm('确定要删除此SKU吗？')) {
+                window.previewSKUs.splice(index, 1);
+                
+                if (window.previewSKUs.length === 0) {
+                    alert('已删除全部SKU，预览关闭');
+                    cancelSKUPreview();
+                } else {
+                    renderSKUPreviewSection(window.previewSKUs, window.previewSelectedParams);
+                }
+            }
+        }
+        
+        // 关闭SKU预览
+        function cancelSKUPreview() {
+            document.getElementById('skuPreviewSection').style.display = 'none';
+            window.previewSKUs = null;
+            window.previewSelectedParams = null;
+        }
+        
+        // 取消SKU预览模态框
+        function closeSKUPreviewModal() {
+            document.getElementById('skuPreviewModal').classList.remove('show');
+            window.previewSKUs = null;
+            window.previewSelectedParams = null;
+        }
+        
+        // 确认生成SKU - 将预览的SKU正式添加
+        function confirmGenerateSKUs() {
+            if (!window.previewSKUs || window.previewSKUs.length === 0) {
+                alert('没有SKU可以添加');
+                return;
+            }
+            
+            // 从预览区域中获取最新的编辑内容
+            const container = document.getElementById('previewSKUContainer');
+            const skuCards = container.querySelectorAll('.sku-card');
+            
+            skuCards.forEach((card, index) => {
+                if (index < window.previewSKUs.length) {
+                    const priceInput = card.querySelector('.preview-price');
+                    const discountInput = card.querySelector('.preview-discount');
+                    const discountPriceInput = card.querySelector('.preview-discount-price');
+                    const multiplierInput = card.querySelector('.preview-multiplier');
+                    const remarkInput = card.querySelector('.preview-remark');
+                    
+                    window.previewSKUs[index].price = priceInput.value;
+                    window.previewSKUs[index].discount = discountInput.value + '%';
+                    window.previewSKUs[index].discountPrice = discountPriceInput.value;
+                    window.previewSKUs[index].multiplier = multiplierInput.value;
+                    window.previewSKUs[index].remark = remarkInput.value;
+                }
+            });
+            
+            // 渲染正式的SKU表格
+            renderSKUTable(window.previewSKUs, window.previewSelectedParams);
+            
+            // 保存当前SKU数据，供视图切换使用
+            window.currentSKUs = window.previewSKUs;
+            
+            // 关闭预览区域
+            cancelSKUPreview();
+            
+            alert(`已添加 ${window.previewSKUs.length} 个SKU`);
+        }
+        
+        // 递归生成参数组合
+        function generateParameterCombinations(selectedParams) {
+            if (selectedParams.length === 0) return [];
+            
+            // 获取每个选中参数的值
+            const paramArrays = selectedParams.map(paramKey => ({
+                key: paramKey,
+                name: parameterDefinitions[paramKey].name,
+                values: parameterDefinitions[paramKey].values
+            }));
+            
+            // 使用笛卡尔积生成所有组合
+            function cartesianProduct(arrays) {
+                if (arrays.length === 0) return [[]];
+                if (arrays.length === 1) {
+                    return arrays[0].values.map(value => [{ 
+                        key: arrays[0].key, 
+                        name: arrays[0].name, 
+                        value: value 
+                    }]);
+                }
+                
+                const result = [];
+                const firstArray = arrays[0];
+                const restProduct = cartesianProduct(arrays.slice(1));
+                
+                for (const value of firstArray.values) {
+                    for (const combination of restProduct) {
+                        result.push([
+                            { key: firstArray.key, name: firstArray.name, value: value },
+                            ...combination
+                        ]);
+                    }
+                }
+                return result;
+            }
+            
+            const combinations = cartesianProduct(paramArrays);
+            
+            // 转换为SKU对象
+            return combinations.map((combo, index) => ({
+                id: `sku_${String(index + 1).padStart(3, '0')}`,
+                params: combo,
+                price: '0.50',
+                discount: '100%',
+                discountPrice: '0.50',
+                multiplier: '1', // 新增倍数字段
+                remark: '' // 新增备注字段
+            }));
+        }
+        
+        // 渲染SKU表格
+        function renderSKUTable(skus, selectedParams, viewMode = 'matrix') {
+            // 保存当前选中的参数到全局变量，供编辑时使用
+            window.currentSelectedParams = selectedParams;
+            window.currentSKUViewMode = viewMode || 'matrix';
+            
+            let html = `
+                <div class="config-section" style="margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2 style="margin: 0;">已生成的SKU列表（共 ${skus.length} 个）</h2>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-size: 13px; color: #666;">视图模式：</span>
+                            <button class="btn btn-secondary btn-small ${viewMode === 'matrix' ? 'active' : ''}" onclick="switchSKUViewMode('matrix')" style="${viewMode === 'matrix' ? 'background-color: #1890ff; color: #fff;' : ''}">矩阵样式</button>
+                            <button class="btn btn-secondary btn-small ${viewMode === 'list' ? 'active' : ''}" onclick="switchSKUViewMode('list')" style="${viewMode === 'list' ? 'background-color: #1890ff; color: #fff;' : ''}">列表样式</button>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="sku-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px; position: sticky; left: 0; background-color: #fafafa; z-index: 1;">SKU名称</th>
+            `;
+            
+            if (viewMode === 'matrix') {
+                // 矩阵样式：每个参数一列
+                selectedParams.forEach(paramKey => {
+                    const param = getParamDef(paramKey);
+                    html += `<th style="min-width: 100px;">${param.name}</th>`;
+                });
+            } else {
+                // 列表样式：参数合并到一列
+                html += `<th style="min-width: 200px;">参数</th>`;
+            }
+            
+            html += `
+                                    <th style="width: 100px;">刊例价</th>
+                                    <th style="width: 80px;">折扣</th>
+                                    <th style="width: 100px;">折扣价</th>
+                                    <th style="width: 80px;">倍数</th>
+                                    <th style="width: 200px;">备注</th>
+                                    <th style="width: 120px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            skus.forEach((sku, rowIndex) => {
+                html += `<tr>
+                    <td style="position: sticky; left: 0; background-color: #fff; z-index: 1;"><span class="sku-name">${sku.id}</span></td>`;
+                
+                if (viewMode === 'matrix') {
+                    // 矩阵样式：每个参数值单独显示
+                    selectedParams.forEach(paramKey => {
+                        const paramValue = sku.params.find(p => p.key === paramKey);
+                        html += `<td>${paramValue ? paramValue.value : '-'}</td>`;
+                    });
+                } else {
+                    // 列表样式：参数合并显示
+                    let paramsText = '';
+                    selectedParams.forEach((paramKey, index) => {
+                        const paramValue = sku.params.find(p => p.key === paramKey);
+                        const param = getParamDef(paramKey);
+                        if (paramValue) {
+                            if (index > 0) paramsText += '<br>';
+                            paramsText += `<span style="color: #666;">${param.name}:</span> <span style="font-weight: 500;">${paramValue.value}</span>`;
+                        }
+                    });
+                    html += `<td style="line-height: 1.6; padding: 8px 12px;">${paramsText}</td>`;
+                }
+                
+                html += `
+                    <td><input type="number" step="0.01" value="${sku.price}" style="width: 80px; padding: 4px;" onchange="calculateDiscountPrice(this)"></td>
+                    <td><input type="number" value="100" style="width: 60px; padding: 4px;" placeholder="100" onchange="calculateDiscountPrice(this)"><span style="font-size: 12px; margin-left: 2px;">%</span></td>
+                    <td><input type="text" value="${sku.discountPrice}" style="width: 80px; padding: 4px;" disabled></td>
+                    <td><input type="number" step="0.01" value="${sku.multiplier}" style="width: 60px; padding: 4px;" placeholder="1"></td>
+                    <td><input type="text" value="${sku.remark}" placeholder="添加备注信息..." style="width: 180px; padding: 6px; border: 1px solid #d9d9d9; border-radius: 3px;" onchange="updateSKURemark('${sku.id}', this.value)"></td>
+                    <td><span class="sku-edit-btn" onclick="editSKU('${sku.id}')">编辑</span> | <span class="sku-delete-btn" onclick="deleteSKU('${sku.id}')">删除</span></td>
+                </tr>`;
+            });
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary">保存为草稿</button>
+                        <button class="btn btn-primary">保存配置</button>
+                    </div>
+                </div>
+            `;
+            
+            // 查找已存在的SKU表格并替换
+            const autoSkuTab = document.getElementById('auto-sku');
+            const existingSKUSection = autoSkuTab.querySelector('.config-section:nth-of-type(2)');
+            if (existingSKUSection) {
+                existingSKUSection.remove();
+            }
+            
+            const configSection = autoSkuTab.querySelector('.config-section');
+            configSection.insertAdjacentHTML('afterend', html);
+        }
+        
+        // 切换SKU视图模式
+        function switchSKUViewMode(mode) {
+            if (!window.currentSKUs || !window.currentSelectedParams) {
+                alert('请先生成SKU列表');
+                return;
+            }
+            
+            // 保存当前表格中的编辑数据
+            const table = document.querySelector('.sku-table tbody');
+            if (table) {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    if (index < window.currentSKUs.length) {
+                        const cells = row.querySelectorAll('td');
+                        const priceInput = cells[cells.length - 6].querySelector('input');
+                        const discountInput = cells[cells.length - 5].querySelector('input');
+                        const discountPriceInput = cells[cells.length - 4].querySelector('input');
+                        const multiplierInput = cells[cells.length - 3].querySelector('input');
+                        const remarkInput = cells[cells.length - 2].querySelector('input');
+                        
+                        if (priceInput) window.currentSKUs[index].price = priceInput.value;
+                        if (discountInput) window.currentSKUs[index].discount = discountInput.value + '%';
+                        if (discountPriceInput) window.currentSKUs[index].discountPrice = discountPriceInput.value;
+                        if (multiplierInput) window.currentSKUs[index].multiplier = multiplierInput.value;
+                        if (remarkInput) window.currentSKUs[index].remark = remarkInput.value;
+                    }
+                });
+            }
+            
+            // 重新渲染表格
+            renderSKUTable(window.currentSKUs, window.currentSelectedParams, mode);
+        }
+        
+        // 计算折扣价
+        function calculateDiscountPrice(input) {
+            const row = input.closest('tr');
+            const priceInput = row.querySelector('input[type="number"][step="0.01"]');
+            const discountInput = row.querySelector('input[value*="%"]').previousElementSibling;
+            const discountPriceInput = row.querySelector('input[disabled]');
+            
+            const price = parseFloat(priceInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 100;
+            const discountPrice = (price * discount / 100).toFixed(2);
+            
+            discountPriceInput.value = discountPrice;
+        }
+        
+        // 更新SKU备注
+        function updateSKURemark(skuId, remark) {
+            // 这里可以存储备注到本地存储或服务器
+            console.log(`SKU ${skuId} 备注已更新: ${remark}`);
+            // 可选：保存到 localStorage
+            const remarks = JSON.parse(localStorage.getItem('skuRemarks') || '{}');
+            remarks[skuId] = remark;
+            localStorage.setItem('skuRemarks', JSON.stringify(remarks));
+        }
+        
+        // 页面导航
+        function openConfigPage(operatorName, operatorCode) {
+            document.querySelector('.operator-list-page').classList.remove('active');
+            document.querySelector('.config-page').classList.add('active');
+            document.getElementById('operatorName').textContent = operatorName;
+            document.getElementById('configTitle').textContent = operatorName + ' - 成本配置';
+            
+            // 初始化参数配置
+            onParamSelected();
+        }
+        
+        function goBackToList() {
+            document.querySelector('.operator-list-page').classList.add('active');
+            document.querySelector('.config-page').classList.remove('active');
+        }
+        
+        // 标签页切换
+        function switchTab(tabEl, tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            tabEl.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        function resetParams() {
+            // 恢复参数定义到初始状态
+            parameterDefinitions.input.params.model.values = ['kling-2.5', 'kling-2.6'];
+            parameterDefinitions.input.params.resolution.values = ['1080p', '2k', '4k'];
+            parameterDefinitions.input.params.mode.values = ['std', 'pro'];
+            parameterDefinitions.output.params.actual_duration.values = ['5秒', '10秒', '30秒'];
+            parameterDefinitions.output.params.output.values = ['standard', 'high_quality'];
+            
+            // 保持之前的选择
+            onParamSelected();
+            alert('参数已重置为默认值');
+        }
+        
+        // SKU编辑和删除
+        function editSKU(skuId) {
+            // 从当前渲染的表格中查找SKU数据
+            const table = document.querySelector('.sku-table tbody');
+            const rows = table.querySelectorAll('tr');
+            let skuData = null;
+            let rowElement = null;
+            
+            rows.forEach(row => {
+                const skuNameEl = row.querySelector('.sku-name');
+                if (skuNameEl && skuNameEl.textContent === skuId) {
+                    rowElement = row;
+                    const cells = row.querySelectorAll('td');
+                    
+                    // 提取参数信息
+                    const params = [];
+                    const paramCells = Array.from(cells).slice(1, cells.length - 5); // 跳过SKU名称，排除最后5列（刊例价、折扣、折扣价、倍数、备注、操作）
+                    
+                    if (window.currentSelectedParams) {
+                        paramCells.forEach((cell, index) => {
+                            if (index < window.currentSelectedParams.length) {
+                                const paramKey = window.currentSelectedParams[index];
+                                const param = getParamDef(paramKey);
+                                params.push({
+                                    key: paramKey,
+                                    name: param.name,
+                                    value: cell.textContent
+                                });
+                            }
+                        });
+                    }
+                    
+                    // 提取成本信息
+                    const priceInput = cells[cells.length - 6].querySelector('input');
+                    const discountInput = cells[cells.length - 5].querySelector('input');
+                    const discountPriceInput = cells[cells.length - 4].querySelector('input');
+                    const multiplierInput = cells[cells.length - 3].querySelector('input');
+                    const remarkInput = cells[cells.length - 2].querySelector('input');
+                    
+                    skuData = {
+                        id: skuId,
+                        params: params,
+                        price: priceInput ? priceInput.value : '0.50',
+                        discount: discountInput ? discountInput.value : '100',
+                        discountPrice: discountPriceInput ? discountPriceInput.value : '0.50',
+                        multiplier: multiplierInput ? multiplierInput.value : '1',
+                        remark: remarkInput ? remarkInput.value : '',
+                        rowElement: rowElement
+                    };
+                }
+            });
+            
+            if (!skuData) {
+                alert('未找到SKU数据');
+                return;
+            }
+            
+            // 保存当前编辑的SKU信息到全局变量
+            window.currentEditingSKU = skuData;
+            
+            // 填充模态框
+            openEditSKUModal(skuData);
+        }
+        
+        // 打开编辑SKU模态框
+        function openEditSKUModal(skuData) {
+            // 填充SKU ID
+            document.getElementById('editSKUId').textContent = skuData.id;
+            
+            // 填充参数信息
+            const paramsContainer = document.getElementById('editSKUParams');
+            paramsContainer.innerHTML = '';
+            
+            if (skuData.params && skuData.params.length > 0) {
+                skuData.params.forEach(param => {
+                    const paramDiv = document.createElement('div');
+                    paramDiv.style.cssText = 'display: flex; flex-direction: column;';
+                    paramDiv.innerHTML = `
+                        <label style="font-weight: 600; margin-bottom: 6px; color: #666;">${param.name}</label>
+                        <div style="padding: 8px; background-color: #f5f5f5; border-radius: 4px; color: #333;">
+                            ${param.value}
+                        </div>
+                    `;
+                    paramsContainer.appendChild(paramDiv);
+                });
+            } else {
+                document.getElementById('editSKUParamsContainer').style.display = 'none';
+            }
+            
+            // 填充成本信息
+            document.getElementById('editSKUPrice').value = skuData.price;
+            document.getElementById('editSKUDiscount').value = skuData.discount;
+            document.getElementById('editSKUDiscountPrice').value = skuData.discountPrice;
+            document.getElementById('editSKUMultiplier').value = skuData.multiplier;
+            document.getElementById('editSKURemark').value = skuData.remark;
+            
+            // 显示模态框
+            document.getElementById('editSKUModal').classList.add('show');
+        }
+        
+        // 关闭编辑SKU模态框
+        function closeEditSKUModal() {
+            document.getElementById('editSKUModal').classList.remove('show');
+            window.currentEditingSKU = null;
+        }
+        
+        // 计算编辑模态框中的折扣价
+        function calculateEditSKUDiscountPrice() {
+            const priceInput = document.getElementById('editSKUPrice');
+            const discountInput = document.getElementById('editSKUDiscount');
+            const discountPriceInput = document.getElementById('editSKUDiscountPrice');
+            
+            const price = parseFloat(priceInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 100;
+            const discountPrice = (price * discount / 100).toFixed(2);
+            discountPriceInput.value = discountPrice;
+        }
+        
+        // 保存编辑的SKU
+        function saveEditedSKU() {
+            if (!window.currentEditingSKU) {
+                alert('未找到编辑的SKU数据');
+                return;
+            }
+            
+            const rowElement = window.currentEditingSKU.rowElement;
+            if (!rowElement) {
+                alert('未找到SKU行元素');
+                return;
+            }
+            
+            // 获取编辑后的值
+            const price = document.getElementById('editSKUPrice').value;
+            const discount = document.getElementById('editSKUDiscount').value;
+            const discountPrice = document.getElementById('editSKUDiscountPrice').value;
+            const multiplier = document.getElementById('editSKUMultiplier').value;
+            const remark = document.getElementById('editSKURemark').value;
+            
+            // 更新表格中的值
+            const cells = rowElement.querySelectorAll('td');
+            const priceInput = cells[cells.length - 6].querySelector('input');
+            const discountInput = cells[cells.length - 5].querySelector('input');
+            const discountPriceInput = cells[cells.length - 4].querySelector('input');
+            const multiplierInput = cells[cells.length - 3].querySelector('input');
+            const remarkInput = cells[cells.length - 2].querySelector('input');
+            
+            if (priceInput) priceInput.value = price;
+            if (discountInput) discountInput.value = discount;
+            if (discountPriceInput) discountPriceInput.value = discountPrice;
+            if (multiplierInput) multiplierInput.value = multiplier;
+            if (remarkInput) remarkInput.value = remark;
+            
+            // 关闭模态框
+            closeEditSKUModal();
+            
+            alert('SKU修改已保存');
+        }
+        
+        function deleteSKU(skuName) {
+            if (confirm(`确定要删除 ${skuName} 吗？`)) {
+                alert(`${skuName} 已删除`);
+            }
+        }
+        
+        function editCustomSKU(skuName) {
+            alert(`编辑自定义SKU: ${skuName}`);
+        }
+        
+        function deleteCustomSKU(skuName) {
+            if (confirm(`确定要删除 ${skuName} 吗？`)) {
+                alert(`${skuName} 已删除`);
+            }
+        }
+        
+        // 模态框管理
+        function openAddCustomSKUModal() {
+            document.getElementById('customSKUModal').classList.add('show');
+        }
+        
+        function closeCustomSKUModal() {
+            document.getElementById('customSKUModal').classList.remove('show');
+        }
+        
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('show');
+        }
+        
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('show');
+        }
+        
+        function openPreviewModal(operatorCode) {
+            // 示例预览数据
+            const previewData = [
+                ['sku_001', 'kling-2.5, 1080p, std, 有', '0.50', '100%', '0.50'],
+                ['sku_002', 'kling-2.5, 1080p, std, 无', '0.40', '100%', '0.40'],
+                ['sku_003', 'kling-2.5, 2k, std, 有', '1.00', '100%', '1.00'],
+            ];
+            
+            const tbody = document.getElementById('previewTableBody');
+            tbody.innerHTML = previewData.map(row => 
+                `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`
+            ).join('');
+            
+            document.getElementById('previewModal').classList.add('show');
+        }
+        
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+        
+        // 批量操作
+        function showBatchPreview() {
+            document.getElementById('batchPreview').style.display = 'block';
+        }
+        
+        function confirmBatchDiscount() {
+            alert('批量折扣调整已完成！');
+            document.getElementById('batchPreview').style.display = 'none';
+        }
+        
+        function cancelBatchDiscount() {
+            document.getElementById('batchPreview').style.display = 'none';
+        }
+        
+        // 导入导出
+        function handleFileDrop(event) {
+            event.preventDefault();
+            alert('文件上传功能演示');
+        }
+        
+        function exportOperatorData() {
+            alert('算子成本配置已导出为 Excel 文件');
+        }
+        
+        function exportData() {
+            alert('所有算子配置已导出为 Excel 文件');
+        }
+        
+        // 关闭模态框 - 点击外部区域
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 渲染参数选择区域
+            renderParamSelection();
+            
+            // 默认显示分辨率和模式的配置
+            try {
+                const resolutionCheckbox = document.querySelector('[value="resolution"]');
+                const modeCheckbox = document.querySelector('[value="mode"]');
+                if (resolutionCheckbox) resolutionCheckbox.checked = true;
+                if (modeCheckbox) modeCheckbox.checked = true;
+                onParamSelected();
+            } catch (e) {
+                console.error('初始化参数选择时出错:', e);
+            }
+        });
+        */
+    </script>
+
+    <script>
+        const STORAGE_KEY = 'cost-config2.v1';
+
+        const PARAM_CATALOG = {
+            input: {
+                category: '入参',
+                params: {
+                    model: { name: '模型', values: ['kling-2.5', 'kling-2.6'] },
+                    resolution: { name: '分辨率', values: ['1080p', '2k', '4k'] },
+                    mode: { name: '模式', values: ['std', 'pro'] },
+                    audio: { name: '是否有音频', values: ['true', 'false'] }
+                }
+            },
+            output: {
+                category: '出参',
+                params: {
+                    actual_duration: { name: '实际视频时长', values: ['5秒', '10秒', '30秒'] },
+                    output: { name: 'Output', values: ['standard', 'high_quality'] }
+                }
+            }
+        };
+
+        const BILLING_UNITS = {
+            times: '次数',
+            seconds: '时长(秒)',
+            chars: '字符数',
+            tokens: 'Token数',
+            sentences: '句数',
+            pages: '文档页数'
+        };
+
+        function getBillingUnitOptions() {
+            const sel = document.getElementById('billingUnitSelect');
+            if (sel && sel.options && sel.options.length > 0) {
+                return Array.from(sel.options).map(o => ({
+                    value: String(o.value || '').trim(),
+                    label: String(o.textContent || '').trim() || String(o.value || '').trim()
+                })).filter(o => o.value);
+            }
+            return Object.entries(BILLING_UNITS).map(([value, label]) => ({ value, label }));
+        }
+
+        function getDefaultCostUnit(op) {
+            return (op && op.unitConfig && op.unitConfig.unit) ? op.unitConfig.unit : 'times';
+        }
+
+        function normalizeCostUnit(op, costUnit) {
+            const opts = getBillingUnitOptions();
+            const u = String(costUnit || '').trim() || getDefaultCostUnit(op);
+            return opts.some(o => o.value === u) ? u : getDefaultCostUnit(op);
+        }
+
+        function billingUnitOptionsHtml(selectedValue) {
+            const opts = getBillingUnitOptions();
+            const selected = opts.some(o => o.value === selectedValue) ? selectedValue : (opts[0]?.value || 'times');
+            return opts.map(o => {
+                const v = escapeHtml(o.value);
+                const label = escapeHtml(o.label);
+                return `<option value="${v}" ${o.value === selected ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+        }
+
+        function nowIso() {
+            return new Date().toISOString();
+        }
+
+        function formatTime(iso) {
+            if (!iso) return '-';
+            const d = new Date(iso);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function deepClone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        function uid(prefix = 'id') {
+            return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+        }
+
+        function toNumber(value, fallback = 0) {
+            const n = typeof value === 'number' ? value : parseFloat(String(value ?? '').trim());
+            return Number.isFinite(n) ? n : fallback;
+        }
+
+        function clamp(n, min, max) {
+            return Math.max(min, Math.min(max, n));
+        }
+
+        function calcDiscountPrice(listPrice, discountPct) {
+            const lp = toNumber(listPrice, 0);
+            const d = clamp(toNumber(discountPct, 100), 0, 100);
+            return +(lp * d / 100).toFixed(6);
+        }
+
+        function getFlatParams(operator) {
+            const flat = {};
+            for (const catKey of Object.keys(PARAM_CATALOG)) {
+                const cat = PARAM_CATALOG[catKey];
+                for (const key of Object.keys(cat.params)) {
+                    flat[key] = { ...cat.params[key], categoryKey: catKey };
+                }
+            }
+
+            const custom = operator?.customParams || {};
+            for (const key of Object.keys(custom)) {
+                flat[key] = {
+                    name: custom[key].name || key,
+                    values: [],
+                    type: custom[key].type || 'custom',
+                    expression: custom[key].expression || '',
+                    categoryKey: 'custom'
+                };
+            }
+
+            return flat;
+        }
+
+        function makeDemoAutoSkus(valuesByKey) {
+            const resolutionValues = (valuesByKey?.resolution?.length ? valuesByKey.resolution : PARAM_CATALOG.input.params.resolution.values) || [];
+            const modeValues = (valuesByKey?.mode?.length ? valuesByKey.mode : PARAM_CATALOG.input.params.mode.values) || [];
+
+            const priceByResolution = {
+                '1080p': 0.5,
+                '2k': 1.0,
+                '4k': 2.0
+            };
+
+            const rows = [];
+            let idx = 1;
+            for (const r of resolutionValues.slice(0, 3)) {
+                for (const m of modeValues.slice(0, 2)) {
+                    const base = priceByResolution[String(r)] ?? 1.0;
+                    const modeAdd = String(m) === 'pro' ? 0.2 : 0;
+                    const listPrice = +((base + modeAdd)).toFixed(6);
+                    const discountPct = 100;
+                    rows.push({
+                        id: uid('auto_demo'),
+                        skuName: `sku_${String(idx++).padStart(3, '0')}`,
+                        params: { resolution: String(r), mode: String(m) },
+                        listPrice,
+                        discountPct,
+                        discountPrice: calcDiscountPrice(listPrice, discountPct),
+                        remark: '示例值（可编辑）'
+                    });
+                }
+            }
+            return rows;
+        }
+
+        function seedDemoAutoSkusIfOperatorEmpty(op) {
+            if (!op) return;
+            const hasAnyCostRows =
+                (op.autoSku?.skus?.length || 0) > 0 ||
+                (op.customSkus?.length || 0) > 0 ||
+                (op.unitConfig?.rows?.length || 0) > 0;
+            if (hasAnyCostRows) return;
+
+            if (!op.autoSku) {
+                op.autoSku = { selectedKeys: [], valuesByKey: {}, viewMode: 'matrix', skus: [] };
+            }
+            if (!op.autoSku.valuesByKey) op.autoSku.valuesByKey = {};
+
+            // Ensure resolution/mode exist so the list has meaningful demo values.
+            if (!Array.isArray(op.autoSku.valuesByKey.resolution) || op.autoSku.valuesByKey.resolution.length === 0) {
+                op.autoSku.valuesByKey.resolution = deepClone(PARAM_CATALOG.input.params.resolution.values);
+            }
+            if (!Array.isArray(op.autoSku.valuesByKey.mode) || op.autoSku.valuesByKey.mode.length === 0) {
+                op.autoSku.valuesByKey.mode = deepClone(PARAM_CATALOG.input.params.mode.values);
+            }
+
+            if (!Array.isArray(op.autoSku.selectedKeys)) op.autoSku.selectedKeys = [];
+            if (!op.autoSku.selectedKeys.includes('resolution')) op.autoSku.selectedKeys.push('resolution');
+            if (!op.autoSku.selectedKeys.includes('mode')) op.autoSku.selectedKeys.push('mode');
+
+            op.autoSku.skus = makeDemoAutoSkus(op.autoSku.valuesByKey);
+            op.updatedAt = nowIso();
+        }
+
+        function makeDefaultOperator(code, name, desc) {
+            const valuesByKey = {
+                resolution: deepClone(PARAM_CATALOG.input.params.resolution.values),
+                mode: deepClone(PARAM_CATALOG.input.params.mode.values)
+            };
+
+            const vendor = String(code || '').toLowerCase().includes('kling') ? '可灵' : '默认厂商';
+
+            return {
+                code,
+                name,
+                desc,
+                vendor,
+                updatedAt: nowIso(),
+                customParams: {},
+                autoSku: {
+                    selectedKeys: ['resolution', 'mode'],
+                    valuesByKey,
+                    viewMode: 'matrix',
+                    skus: makeDemoAutoSkus(valuesByKey)
+                },
+                customSkus: [],
+                unitConfig: {
+                    unit: 'times',
+                    rows: []
+                }
+            };
+        }
+
+        function makeDefaultStore() {
+            return {
+                version: 1,
+                updatedAt: nowIso(),
+                operators: [
+                    makeDefaultOperator('kling_video_gen', '可灵图生视频', '文本、图片生成高质量视频'),
+                    makeDefaultOperator('tts_service', '文本转语音', '将文本转换为自然语音'),
+                    makeDefaultOperator('image_upscale', '图片超分', '提升图片分辨率和质量'),
+                    makeDefaultOperator('code_executor', '代码执行', '执行代码并返回结果')
+                ]
+            };
+        }
+
+        let store = null;
+        let currentOperatorCode = null;
+        let pendingImport = null;
+        let batchPreviewMatches = null;
+        let globalBatchPreviewMatches = null;
+
+        function loadStore() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return makeDefaultStore();
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.operators)) return makeDefaultStore();
+                for (const op of parsed.operators) {
+                    if (op && typeof op === 'object') {
+                        if (!('vendor' in op)) op.vendor = '默认厂商';
+                    }
+                }
+                return parsed;
+            } catch {
+                return makeDefaultStore();
+            }
+        }
+
+        function saveStore() {
+            store.updatedAt = nowIso();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+        }
+
+        function getOperator(code) {
+            return store.operators.find(o => o.code === code) || null;
+        }
+
+        function touchOperator(op) {
+            op.updatedAt = nowIso();
+            saveStore();
+        }
+
+        function listAllFilterKeys() {
+            const keys = new Set();
+            for (const catKey of Object.keys(PARAM_CATALOG)) {
+                for (const k of Object.keys(PARAM_CATALOG[catKey].params)) keys.add(k);
+            }
+            for (const op of store.operators) {
+                for (const k of Object.keys(op.customParams || {})) keys.add(k);
+            }
+            return Array.from(keys).sort();
+        }
+
+        function updateBatchFilterKeyOptions() {
+            const keys = ['__all__', ...listAllFilterKeys()];
+            const optionHtml = keys.map(k => k === '__all__'
+                ? '<option value="__all__">不筛选（匹配全部SKU）</option>'
+                : `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`
+            ).join('');
+
+            // Legacy selects (if present)
+            const el1 = document.getElementById('batchFilterKeySelect');
+            const el2 = document.getElementById('globalBatchFilterKeySelect');
+            if (el1) {
+                const cur = el1.value || '__all__';
+                el1.innerHTML = optionHtml;
+                el1.value = keys.includes(cur) ? cur : '__all__';
+            }
+            if (el2) {
+                const cur = el2.value || '__all__';
+                el2.innerHTML = optionHtml;
+                el2.value = keys.includes(cur) ? cur : '__all__';
+            }
+
+            // Multi-filter selects
+            document.querySelectorAll('select.batch-filter-key').forEach(sel => {
+                const cur = sel.value || '__all__';
+                sel.innerHTML = optionHtml;
+                sel.value = keys.includes(cur) ? cur : '__all__';
+            });
+            document.querySelectorAll('select.global-batch-filter-key').forEach(sel => {
+                const cur = sel.value || '__all__';
+                sel.innerHTML = optionHtml;
+                sel.value = keys.includes(cur) ? cur : '__all__';
+            });
+        }
+
+        function ensureBatchFiltersUI() {
+            const batchBox = document.getElementById('batchFiltersContainer');
+            if (batchBox && batchBox.children.length === 0) addBatchFilterRow('batch');
+            const globalBox = document.getElementById('globalBatchFiltersContainer');
+            if (globalBox && globalBox.children.length === 0) addBatchFilterRow('global');
+        }
+
+        function addBatchFilterRow(kind) {
+            const containerId = kind === 'global' ? 'globalBatchFiltersContainer' : 'batchFiltersContainer';
+            const keyClass = kind === 'global' ? 'global-batch-filter-key' : 'batch-filter-key';
+            const valClass = kind === 'global' ? 'global-batch-filter-value' : 'batch-filter-value';
+            const box = document.getElementById(containerId);
+            if (!box) return;
+
+            const row = document.createElement('div');
+            row.className = 'filter-row';
+            row.style.cssText = 'display:flex; gap:10px; align-items:center;';
+            row.innerHTML = `
+                <select class="${keyClass}" style="flex: 0 0 180px; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px;"></select>
+                <input class="${valClass}" type="text" placeholder="筛选值" style="flex: 1; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                <button class="btn btn-danger btn-small" type="button" onclick="removeBatchFilterRow(this)">删除</button>
+            `;
+            box.appendChild(row);
+            updateBatchFilterKeyOptions();
+            const sel = row.querySelector('select');
+            if (sel) sel.value = '__all__';
+        }
+
+        function removeBatchFilterRow(btn) {
+            const row = btn?.closest('.filter-row');
+            const box = row?.parentElement;
+            if (row) row.remove();
+            if (box && box.children.length === 0) {
+                if (box.id === 'globalBatchFiltersContainer') addBatchFilterRow('global');
+                else addBatchFilterRow('batch');
+            }
+        }
+
+        function clearBatchFilters(kind) {
+            const id = kind === 'global' ? 'globalBatchFiltersContainer' : 'batchFiltersContainer';
+            const box = document.getElementById(id);
+            if (!box) return;
+            box.innerHTML = '';
+            addBatchFilterRow(kind);
+        }
+
+        function collectBatchFilters(kind) {
+            const filters = [];
+
+            const containerId = kind === 'global' ? 'globalBatchFiltersContainer' : 'batchFiltersContainer';
+            const box = document.getElementById(containerId);
+            if (box) {
+                const keySelClass = kind === 'global' ? 'global-batch-filter-key' : 'batch-filter-key';
+                const valClass = kind === 'global' ? 'global-batch-filter-value' : 'batch-filter-value';
+                box.querySelectorAll('.filter-row').forEach(r => {
+                    const key = r.querySelector(`select.${keySelClass}`)?.value || '__all__';
+                    const value = r.querySelector(`input.${valClass}`)?.value || '';
+                    const k = String(key || '__all__');
+                    const v = String(value || '').trim();
+                    if (!v || k === '__all__') return;
+                    filters.push({ key: k, value: v });
+                });
+                return filters;
+            }
+
+            // Fallback to legacy single filter UI
+            if (kind === 'global') {
+                const key = document.getElementById('globalBatchFilterKeySelect')?.value || '__all__';
+                const val = (document.getElementById('globalBatchFilterValueInput')?.value || '').trim();
+                if (val && key !== '__all__') filters.push({ key, value: val });
+            } else {
+                const key = document.getElementById('batchFilterKeySelect')?.value || '__all__';
+                const val = (document.getElementById('batchFilterValueInput')?.value || '').trim();
+                if (val && key !== '__all__') filters.push({ key, value: val });
+            }
+            return filters;
+        }
+
+        function skuMatchesAllFilters(item, filters) {
+            if (!filters || filters.length === 0) return true;
+            return filters.every(f => skuMatchesFilter(item, f.key, f.value));
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        // ---------------- Operator List ----------------
+        function renderOperatorList() {
+            const tbody = document.getElementById('operatorTableBody');
+            if (!tbody) return;
+
+            const q = (document.getElementById('operatorSearchInput')?.value || '').trim().toLowerCase();
+            const rows = store.operators
+                .filter(op => !q || op.name.toLowerCase().includes(q) || op.code.toLowerCase().includes(q))
+                .map(op => {
+                    const skuCount = (op.autoSku?.skus?.length || 0) + (op.customSkus?.length || 0) + (op.unitConfig?.rows?.length || 0);
+                    return `
+                        <tr>
+                            <td><strong>${escapeHtml(op.name)}</strong></td>
+                            <td>${escapeHtml(op.code)}</td>
+                            <td>${escapeHtml(op.desc || '')}</td>
+                            <td><span style="background-color: #f0f0f0; padding: 2px 8px; border-radius: 2px;">${skuCount}</span></td>
+                            <td>${escapeHtml(formatTime(op.updatedAt))}</td>
+                            <td class="action-cell">
+                                <button class="btn btn-primary btn-small" data-code="${escapeHtml(op.code)}" onclick="openConfigByCode(this.dataset.code)">配置成本</button>
+                                <button class="btn btn-secondary btn-small" data-code="${escapeHtml(op.code)}" onclick="openPreviewModal(this.dataset.code)">预览</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            tbody.innerHTML = rows.join('') || `<tr><td colspan="6" style="color:#999;">没有匹配的算子</td></tr>`;
+        }
+
+        function openConfigByCode(operatorCode) {
+            const op = getOperator(operatorCode);
+            if (!op) {
+                alert('未找到算子数据');
+                return;
+            }
+            openConfigPage(op.name, op.code);
+        }
+
+        // ---------------- Navigation ----------------
+        function openConfigPage(operatorName, operatorCode) {
+            const op = getOperator(operatorCode);
+            if (!op) {
+                alert('未找到算子数据');
+                return;
+            }
+            currentOperatorCode = operatorCode;
+
+            document.querySelector('.operator-list-page').classList.remove('active');
+            document.querySelector('.config-page').classList.add('active');
+            document.getElementById('operatorName').textContent = operatorName;
+            document.getElementById('configTitle').textContent = operatorName + ' - 成本配置';
+
+            renderAllOperatorViews();
+        }
+
+        function goBackToList() {
+            document.querySelector('.operator-list-page').classList.add('active');
+            document.querySelector('.config-page').classList.remove('active');
+            currentOperatorCode = null;
+            renderOperatorList();
+        }
+
+        function switchTab(tabEl, tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            tabEl.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function renderAllOperatorViews() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            renderParamSelection();
+            renderParamConfig(op.autoSku.selectedKeys);
+            calculateSKUCount(op.autoSku.selectedKeys);
+            renderAutoSkuTable();
+            renderCustomSkuTable();
+            renderUnitConfig();
+            updateBatchFilterKeyOptions();
+            ensureBatchFiltersUI();
+        }
+
+        // ---------------- Auto SKU Param Selection ----------------
+        function renderParamSelection() {
+            const op = getOperator(currentOperatorCode);
+            const container = document.querySelector('.available-params');
+            if (!container || !op) return;
+
+            const flat = getFlatParams(op);
+            const selected = new Set(op.autoSku.selectedKeys || []);
+
+            let html = '';
+            for (const catKey of Object.keys(PARAM_CATALOG)) {
+                const cat = PARAM_CATALOG[catKey];
+                html += `<h3 style="font-size: 14px; margin: 15px 0 10px 0; font-weight: 600;">${escapeHtml(cat.category)}</h3>`;
+                for (const paramKey of Object.keys(cat.params)) {
+                    const p = flat[paramKey];
+                    const valueCount = (op.autoSku.valuesByKey[paramKey] || p.values || []).length;
+                    html += `
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; background-color: #fafafa; margin-bottom: 10px; border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" class="param-checkbox" value="${escapeHtml(paramKey)}" ${selected.has(paramKey) ? 'checked' : ''} onchange="onParamSelected()">
+                            <span style="font-weight: 600; flex: 1;">${escapeHtml(p.name)}</span>
+                            <span style="color: #999; font-size: 12px;">${valueCount}个值</span>
+                        </label>
+                    `;
+                }
+            }
+
+            // Custom params section
+            html += `
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                    <h3 style="font-size: 14px; margin-bottom: 10px; font-weight: 600;">自定义参数</h3>
+                    <button class="btn btn-secondary btn-small" onclick="openAddCustomParamModal()" style="margin-bottom: 15px;">+ 新增自定义参数</button>
+            `;
+
+            const customKeys = Object.keys(op.customParams || {});
+            if (customKeys.length === 0) {
+                html += `<p style="color: #999; font-size: 12px;">暂无自定义参数，点击上方按钮添加</p>`;
+            } else {
+                customKeys.sort().forEach(paramKey => {
+                    const p = flat[paramKey];
+                    html += `
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 10px; background-color: #fafafa; margin-bottom: 10px; border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" class="param-checkbox" value="${escapeHtml(paramKey)}" ${selected.has(paramKey) ? 'checked' : ''} onchange="onParamSelected()">
+                            <span style="font-weight: 600; flex: 1;">${escapeHtml(p.name)}</span>
+                            <span style="color: #1890ff; font-size: 11px; background-color: #e6f7ff; padding: 2px 6px; border-radius: 2px;">表达式</span>
+                        </label>
+                    `;
+                });
+            }
+            html += `</div>`;
+
+            container.innerHTML = html;
+        }
+
+        function getSelectedParams() {
+            const checkboxes = document.querySelectorAll('.param-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function onParamSelected() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+
+            const selected = getSelectedParams();
+            op.autoSku.selectedKeys = selected;
+
+            const flat = getFlatParams(op);
+            for (const key of selected) {
+                if (!op.autoSku.valuesByKey[key]) {
+                    const def = flat[key];
+                    op.autoSku.valuesByKey[key] = deepClone(def?.values || []);
+                }
+            }
+            renderParamConfig(selected);
+            calculateSKUCount(selected);
+            touchOperator(op);
+        }
+
+        function renderParamConfig(selectedParams) {
+            const op = getOperator(currentOperatorCode);
+            const container = document.getElementById('selectedParamsConfig');
+            if (!container || !op) return;
+
+            if (!selectedParams || selectedParams.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-size: 13px;">请先选择至少一个参数</p>';
+                return;
+            }
+
+            const flat = getFlatParams(op);
+            container.innerHTML = selectedParams.map(paramKey => {
+                const param = flat[paramKey] || { name: paramKey, values: [] };
+
+                // Custom expression param: show expression editor
+                if (param.categoryKey === 'custom') {
+                    return `
+                        <div class="param-item">
+                            <label>${escapeHtml(param.name)}</label>
+                            <div style="margin-top: 8px;">
+                                <div style="color: #666; font-size: 12px; margin-bottom: 8px; padding: 8px; background-color: #f5f5f5; border-radius: 3px; border-left: 3px solid #1890ff;">
+                                    <strong>表达式:</strong> ${escapeHtml(param.expression || '(未配置)')}
+                                </div>
+                                <button class="add-param-btn" style="margin-top: 8px;" onclick="editCustomParamExpr('${escapeHtml(paramKey)}')">编辑表达式</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const values = op.autoSku.valuesByKey[paramKey] || [];
+                const valuesHtml = values.map(value =>
+                    `<div class="param-tag" data-param="${escapeHtml(paramKey)}" data-value="${escapeHtml(value)}">
+                        ${escapeHtml(value)}
+                        <span class="remove" onclick="removeParamValue(this)">×</span>
+                    </div>`
+                ).join('');
+
+                return `
+                    <div class="param-item">
+                        <label>${escapeHtml(param.name)}</label>
+                        <div style="margin-top: 8px;">
+                            <div style="color: #666; font-size: 12px; margin-bottom: 6px;">已选择 ${values.length} 个值</div>
+                            <div class="param-values">${valuesHtml}</div>
+                            <button class="add-param-btn" style="margin-top: 8px;" onclick="addCustomParamValue('${escapeHtml(paramKey)}')">+ 添加自定义值</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addCustomParamValue(paramKey) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const flat = getFlatParams(op);
+            const p = flat[paramKey] || { name: paramKey };
+            const newValue = prompt(`为"${p.name}"添加新值:`);
+            if (!newValue || !newValue.trim()) return;
+            const v = newValue.trim();
+            const arr = op.autoSku.valuesByKey[paramKey] || (op.autoSku.valuesByKey[paramKey] = []);
+            if (arr.includes(v)) {
+                alert('此值已存在');
+                return;
+            }
+            arr.push(v);
+            touchOperator(op);
+            renderParamConfig(op.autoSku.selectedKeys);
+            calculateSKUCount(op.autoSku.selectedKeys);
+        }
+
+        function removeParamValue(element) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const tag = element.parentElement;
+            const paramKey = tag.getAttribute('data-param');
+            const value = tag.getAttribute('data-value');
+            const arr = op.autoSku.valuesByKey[paramKey] || [];
+            const idx = arr.indexOf(value);
+            if (idx >= 0) arr.splice(idx, 1);
+            touchOperator(op);
+            renderParamConfig(op.autoSku.selectedKeys);
+            calculateSKUCount(op.autoSku.selectedKeys);
+        }
+
+        function calculateSKUCount(selectedParams) {
+            const op = getOperator(currentOperatorCode);
+            const info = document.getElementById('skuCountInfo');
+            if (!info || !op) return;
+
+            if (!selectedParams || selectedParams.length === 0) {
+                info.innerHTML = 'ℹ️ 请先选择参数';
+                return;
+            }
+
+            let count = 1;
+            const parts = [];
+            const flat = getFlatParams(op);
+            for (const key of selectedParams) {
+                const def = flat[key];
+                if (def?.categoryKey === 'custom') continue;
+                const vCount = (op.autoSku.valuesByKey[key] || []).length;
+                count *= Math.max(vCount, 0);
+                parts.push(`${vCount}个${def?.name || key}`);
+            }
+
+            const formula = selectedParams
+                .filter(k => (flat[k]?.categoryKey !== 'custom'))
+                .map(k => (op.autoSku.valuesByKey[k] || []).length)
+                .join(' × ');
+
+            info.innerHTML = `ℹ️ 预计生成 <strong>${count}</strong> 个SKU (${formula || '-'} = ${escapeHtml(parts.join(' × '))})`;
+        }
+
+        function resetParams() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            op.autoSku.valuesByKey = {
+                resolution: deepClone(PARAM_CATALOG.input.params.resolution.values),
+                mode: deepClone(PARAM_CATALOG.input.params.mode.values)
+            };
+            op.autoSku.selectedKeys = ['resolution', 'mode'];
+            touchOperator(op);
+            renderAllOperatorViews();
+            alert('参数已重置为默认值');
+        }
+
+        // ---------------- Bulk Param Input ----------------
+        function clearBulkParamInput() {
+            const el = document.getElementById('bulkParamInput');
+            if (el) el.value = '';
+        }
+
+        function applyBulkParamInput() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const text = (document.getElementById('bulkParamInput')?.value || '').trim();
+            if (!text) {
+                alert('没有可应用的内容');
+                return;
+            }
+
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+            const addedKeys = [];
+            for (const line of lines) {
+                const match = line.match(/^([^:=]+)\s*[:=]\s*(.+)$/);
+                if (!match) continue;
+                const key = match[1].trim();
+                const rhs = match[2].trim();
+                const values = rhs.split(/[，,]/).map(s => s.trim()).filter(Boolean);
+                if (!key || values.length === 0) continue;
+
+                // unknown key -> create as custom param
+                const flat = getFlatParams(op);
+                if (!flat[key]) {
+                    op.customParams[key] = { name: key, type: 'custom', expression: '' };
+                }
+
+                op.autoSku.valuesByKey[key] = values;
+                if (!op.autoSku.selectedKeys.includes(key)) {
+                    op.autoSku.selectedKeys.push(key);
+                    addedKeys.push(key);
+                }
+            }
+
+            touchOperator(op);
+            renderParamSelection();
+            renderParamConfig(op.autoSku.selectedKeys);
+            calculateSKUCount(op.autoSku.selectedKeys);
+            if (addedKeys.length > 0) {
+                alert(`已应用批量输入，并自动勾选参数：${addedKeys.join(', ')}`);
+            }
+        }
+
+        // ---------------- Custom Param Modal ----------------
+        function openAddCustomParamModal() {
+            document.getElementById('customParamModal').classList.add('show');
+        }
+
+        function closeCustomParamModal() {
+            document.getElementById('customParamModal').classList.remove('show');
+        }
+
+        function addCustomParam() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const paramName = document.getElementById('customParamName').value.trim();
+            const paramKey = document.getElementById('customParamKey').value.trim();
+            const paramType = document.getElementById('customParamType').value;
+            const paramExpr = document.getElementById('customParamExpr').value.trim();
+            if (!paramName || !paramKey) {
+                alert('参数名称和英文标识不能为空');
+                return;
+            }
+            const flat = getFlatParams(op);
+            if (flat[paramKey]) {
+                alert('该英文标识已存在，请修改');
+                return;
+            }
+            op.customParams[paramKey] = { name: paramName, type: paramType, expression: paramExpr };
+            touchOperator(op);
+
+            document.getElementById('customParamName').value = '';
+            document.getElementById('customParamKey').value = '';
+            document.getElementById('customParamType').value = 'length';
+            document.getElementById('customParamExpr').value = '';
+            closeCustomParamModal();
+            renderParamSelection();
+            updateBatchFilterKeyOptions();
+            alert('自定义参数添加成功');
+        }
+
+        function editCustomParamExpr(paramKey) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const p = op.customParams[paramKey];
+            if (!p) return;
+            const newExpr = prompt(`编辑"${p.name}"的表达式:`, p.expression || '');
+            if (newExpr === null) return;
+            p.expression = newExpr;
+            touchOperator(op);
+            renderParamConfig(op.autoSku.selectedKeys);
+        }
+
+        // ---------------- Auto SKU generation ----------------
+        function getSkuNameMaxSuffix(op, prefix) {
+            const allNames = [];
+            for (const s of (op.autoSku?.skus || [])) allNames.push(s.skuName);
+            for (const s of (op.customSkus || [])) allNames.push(s.skuName);
+            for (const r of (op.unitConfig?.rows || [])) allNames.push(r.skuName);
+            const re = new RegExp(`^${prefix}_(\\d+)$`);
+            let max = 0;
+            for (const name of allNames) {
+                const m = re.exec(String(name || ''));
+                if (m) max = Math.max(max, parseInt(m[1], 10));
+            }
+            return max;
+        }
+
+        function nextSkuName(op, prefix) {
+            return `${prefix}_${String(getSkuNameMaxSuffix(op, prefix) + 1).padStart(3, '0')}`;
+        }
+
+        function createSkuNameGenerator(op, prefix) {
+            let n = getSkuNameMaxSuffix(op, prefix) + 1;
+            return () => `${prefix}_${String(n++).padStart(3, '0')}`;
+        }
+
+        function generateCombinations(keys, valuesByKey, op) {
+            const flat = getFlatParams(op);
+            const combosKeys = keys.filter(k => flat[k]?.categoryKey !== 'custom');
+            if (combosKeys.length === 0) return [];
+            for (const k of combosKeys) {
+                const arr = valuesByKey[k] || [];
+                if (!arr || arr.length === 0) {
+                    throw new Error(`参数 ${k} 没有可用取值`);
+                }
+            }
+
+            const arrays = combosKeys.map(k => ({ key: k, values: valuesByKey[k] }));
+            const result = [];
+            const backtrack = (i, cur) => {
+                if (i === arrays.length) {
+                    result.push({ ...cur });
+                    return;
+                }
+                const { key, values } = arrays[i];
+                for (const v of values) {
+                    cur[key] = String(v);
+                    backtrack(i + 1, cur);
+                }
+                delete cur[key];
+            };
+            backtrack(0, {});
+            return result;
+        }
+
+        function previewGenerateSKUs() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const keys = op.autoSku.selectedKeys || [];
+            if (keys.length === 0) {
+                alert('请先选择至少一个参数');
+                return;
+            }
+
+            let combos;
+            try {
+                combos = generateCombinations(keys, op.autoSku.valuesByKey, op);
+            } catch (e) {
+                alert(e.message || '生成失败');
+                return;
+            }
+
+            const nextName = createSkuNameGenerator(op, 'sku');
+            const preview = combos.map(params => {
+                const skuName = nextName();
+                return {
+                    id: uid('preview'),
+                    skuName,
+                    params,
+                    listPrice: 0,
+                    discountPct: 100,
+                    discountPrice: 0,
+                    costUnit: getDefaultCostUnit(op),
+                    remark: ''
+                };
+            });
+
+            window.previewSKUs = preview;
+            window.previewSelectedParams = keys;
+
+            renderSKUPreviewSection(preview, keys);
+            document.getElementById('skuPreviewSection').style.display = 'block';
+            document.getElementById('skuPreviewSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderSKUPreviewSection(previewSkus, selectedKeys) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const flat = getFlatParams(op);
+            const container = document.getElementById('previewSKUContainer');
+            container.innerHTML = '';
+
+            previewSkus.forEach((sku, index) => {
+                const paramHtml = selectedKeys
+                    .filter(k => flat[k]?.categoryKey !== 'custom')
+                    .map(k => {
+                        const name = flat[k]?.name || k;
+                        return `<div style="display:flex; gap:8px; align-items:center;">
+                            <span style="font-weight: 600; min-width: 80px; color: #666;">${escapeHtml(name)}:</span>
+                            <span>${escapeHtml(sku.params[k] ?? '-') }</span>
+                        </div>`;
+                    }).join('');
+
+                const card = document.createElement('div');
+                card.className = 'sku-card';
+                card.style.cssText = 'border: 1px solid #d9d9d9; border-radius: 4px; padding: 15px; background-color: #fafafa;';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px;">
+                        <h4 style="margin:0; font-size:14px; color:#333;">
+                            <span style="color:#1890ff; font-weight:600;">${escapeHtml(sku.skuName)}</span>
+                            <span style="color:#999; font-weight:normal; margin-left:8px;">预生成的SKU${index + 1}</span>
+                        </h4>
+                        <span class="sku-delete-btn" onclick="deletePreviewSKU(${index})" style="cursor:pointer;">删除</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 12px;">
+                        ${paramHtml}
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; align-items: flex-end;">
+                        <div>
+                            <label style="display:block; font-size:12px; color:#666; margin-bottom:4px;">刊例价</label>
+                            <input type="number" step="0.0001" value="${escapeHtml(sku.listPrice)}" class="preview-price" style="width:100%; padding:6px; border:1px solid #d9d9d9; border-radius:3px;" oninput="calculatePreviewDiscountPrice(this)">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; color:#666; margin-bottom:4px;">折扣 (%)</label>
+                            <input type="number" value="${escapeHtml(sku.discountPct)}" class="preview-discount" style="width:100%; padding:6px; border:1px solid #d9d9d9; border-radius:3px;" oninput="calculatePreviewDiscountPrice(this)">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; color:#666; margin-bottom:4px;">折扣价</label>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <input type="text" value="${escapeHtml(sku.discountPrice)}" class="preview-discount-price" style="flex:1; min-width: 90px; padding:6px; border:1px solid #d9d9d9; border-radius:3px; background-color:#f5f5f5;" disabled>
+                                <select class="preview-cost-unit" style="width: 110px; padding:6px; border:1px solid #d9d9d9; border-radius:3px;" oninput="window.previewSKUs && (window.previewSKUs[${index}].costUnit = this.value)">
+                                    ${billingUnitOptionsHtml(normalizeCostUnit(op, sku.costUnit))}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; color:#666; margin-bottom:4px;">备注</label>
+                            <input type="text" value="${escapeHtml(sku.remark)}" class="preview-remark" style="width:100%; padding:6px; border:1px solid #d9d9d9; border-radius:3px;" placeholder="备注...">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+                // init
+                setTimeout(() => {
+                    const priceEl = card.querySelector('.preview-price');
+                    if (priceEl) calculatePreviewDiscountPrice(priceEl);
+                }, 0);
+            });
+
+            const section = document.getElementById('skuPreviewSection');
+            let statsDiv = section.querySelector('.preview-stats');
+            if (!statsDiv) {
+                statsDiv = document.createElement('div');
+                statsDiv.className = 'preview-stats';
+                section.insertBefore(statsDiv, section.querySelector('#previewSKUContainer'));
+            }
+            statsDiv.style.cssText = 'padding: 10px 12px; background-color: #e6f7ff; border-radius: 4px; margin-bottom: 15px; font-size: 13px; color: #0050b3;';
+            statsDiv.innerHTML = `预计生成 <strong>${previewSkus.length}</strong> 个SKU`;
+        }
+
+        function toggleSKUPreview() {
+            const section = document.getElementById('skuPreviewSection');
+            const button = (window.event && window.event.target) ? window.event.target : document.activeElement;
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                if (button) button.textContent = '收起';
+            } else {
+                section.style.display = 'none';
+                if (button) button.textContent = '展开';
+            }
+        }
+
+        function calculatePreviewDiscountPrice(inputEl) {
+            const card = inputEl.closest('.sku-card');
+            if (!card) return;
+            const priceEl = card.querySelector('.preview-price');
+            const discountEl = card.querySelector('.preview-discount');
+            const outEl = card.querySelector('.preview-discount-price');
+            const price = toNumber(priceEl?.value, 0);
+            const discount = clamp(toNumber(discountEl?.value, 100), 0, 100);
+            const discountPrice = calcDiscountPrice(price, discount);
+            if (outEl) outEl.value = discountPrice;
+        }
+
+        function deletePreviewSKU(index) {
+            if (!window.previewSKUs) return;
+            if (!confirm('确定要删除此SKU吗？')) return;
+            window.previewSKUs.splice(index, 1);
+            if (window.previewSKUs.length === 0) {
+                cancelSKUPreview();
+                alert('已删除全部SKU，预览关闭');
+                return;
+            }
+            renderSKUPreviewSection(window.previewSKUs, window.previewSelectedParams || []);
+        }
+
+        function cancelSKUPreview() {
+            document.getElementById('skuPreviewSection').style.display = 'none';
+            window.previewSKUs = null;
+            window.previewSelectedParams = null;
+        }
+
+        function closeSKUPreviewModal() {
+            document.getElementById('skuPreviewModal').classList.remove('show');
+        }
+
+        function confirmGenerateSKUs() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            if (!window.previewSKUs || window.previewSKUs.length === 0) {
+                alert('没有SKU可以添加');
+                return;
+            }
+
+            const cards = document.getElementById('previewSKUContainer').querySelectorAll('.sku-card');
+            cards.forEach((card, index) => {
+                if (index >= window.previewSKUs.length) return;
+                const price = toNumber(card.querySelector('.preview-price')?.value, 0);
+                const discountPct = clamp(toNumber(card.querySelector('.preview-discount')?.value, 100), 0, 100);
+                const remark = (card.querySelector('.preview-remark')?.value || '').trim();
+                const costUnit = String(card.querySelector('.preview-cost-unit')?.value || '').trim();
+                const discountPrice = calcDiscountPrice(price, discountPct);
+                window.previewSKUs[index].listPrice = price;
+                window.previewSKUs[index].discountPct = discountPct;
+                window.previewSKUs[index].discountPrice = discountPrice;
+                window.previewSKUs[index].remark = remark;
+                window.previewSKUs[index].costUnit = normalizeCostUnit(op, costUnit || window.previewSKUs[index].costUnit);
+            });
+
+            const added = window.previewSKUs.map(s => ({
+                id: uid('auto'),
+                skuName: s.skuName,
+                params: s.params,
+                listPrice: s.listPrice,
+                discountPct: s.discountPct,
+                discountPrice: s.discountPrice,
+                costUnit: normalizeCostUnit(op, s.costUnit),
+                remark: s.remark
+            }));
+
+            op.autoSku.skus.push(...added);
+            touchOperator(op);
+            cancelSKUPreview();
+            renderAutoSkuTable();
+            renderOperatorList();
+            alert(`已添加 ${added.length} 个SKU`);
+        }
+
+        // ---------------- Auto SKU table ----------------
+        function renderAutoSkuTable() {
+            const op = getOperator(currentOperatorCode);
+            const container = document.getElementById('autoSkuTableContainer');
+            if (!container || !op) return;
+
+            const flat = getFlatParams(op);
+            const selected = op.autoSku.selectedKeys || [];
+            const comboKeys = selected.filter(k => flat[k]?.categoryKey !== 'custom');
+
+            const viewMode = op.autoSku.viewMode || 'matrix';
+            const skus = op.autoSku.skus || [];
+
+            const viewControls = `
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;">
+                    <div style="color:#666; font-size:13px;">共 ${skus.length} 条</div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="font-size: 13px; color: #666;">视图模式：</span>
+                        <button class="btn btn-secondary btn-small" style="${viewMode === 'matrix' ? 'background-color:#1890ff; color:#fff; border-color:#1890ff;' : ''}" onclick="setAutoSkuViewMode('matrix')">矩阵</button>
+                        <button class="btn btn-secondary btn-small" style="${viewMode === 'list' ? 'background-color:#1890ff; color:#fff; border-color:#1890ff;' : ''}" onclick="setAutoSkuViewMode('list')">列表</button>
+                        <button class="btn btn-secondary btn-small" onclick="exportOperatorData()">导出当前算子</button>
+                    </div>
+                </div>
+            `;
+
+            const headers = viewMode === 'matrix'
+                ? comboKeys.map(k => `<th style="min-width: 110px;">${escapeHtml(flat[k]?.name || k)}</th>`).join('')
+                : `<th style="min-width: 260px;">参数</th>`;
+
+            const body = skus.map(sku => {
+                const unit = normalizeCostUnit(op, sku.costUnit);
+                const paramsCell = viewMode === 'matrix'
+                    ? comboKeys.map(k => `<td>${escapeHtml(sku.params?.[k] ?? '-') }</td>`).join('')
+                    : `<td style="line-height:1.6;">
+                        ${comboKeys.map(k => `<div><span style="color:#666;">${escapeHtml(flat[k]?.name || k)}:</span> <strong>${escapeHtml(sku.params?.[k] ?? '-') }</strong></div>`).join('')}
+                      </td>`;
+
+                return `
+                    <tr>
+                        <td style="position: sticky; left: 0; background-color: #fff; z-index: 1;"><span class="sku-name">${escapeHtml(sku.skuName)}</span></td>
+                        ${paramsCell}
+                        <td><input type="number" step="0.0001" value="${escapeHtml(sku.listPrice)}" style="width: 110px;" oninput="updateAutoSkuField('${escapeHtml(sku.id)}', 'listPrice', this.value)"></td>
+                        <td><input type="number" value="${escapeHtml(sku.discountPct)}" style="width: 80px;" oninput="updateAutoSkuField('${escapeHtml(sku.id)}', 'discountPct', this.value)"></td>
+                        <td>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <input type="text" value="${escapeHtml(sku.discountPrice)}" style="width: 110px; background-color:#f5f5f5;" disabled>
+                                <select style="width: 110px;" oninput="updateAutoSkuField('${escapeHtml(sku.id)}', 'costUnit', this.value)">
+                                    ${billingUnitOptionsHtml(unit)}
+                                </select>
+                            </div>
+                        </td>
+                        <td><input type="text" value="${escapeHtml(sku.remark || '')}" style="width: 180px;" oninput="updateAutoSkuField('${escapeHtml(sku.id)}', 'remark', this.value)"></td>
+                        <td>
+                            <span class="sku-edit-btn" onclick="editSKU('${escapeHtml(sku.id)}')">编辑</span>
+                            | <span class="sku-delete-btn" onclick="deleteSKU('${escapeHtml(sku.id)}')">删除</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                ${viewControls}
+                <div style="overflow-x:auto;">
+                    <table class="sku-table" style="margin:0;">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px; position: sticky; left: 0; background-color: #fafafa; z-index: 1;">SKU名称</th>
+                                ${headers}
+                                <th style="width: 140px;">刊例价</th>
+                                <th style="width: 100px;">折扣(%)</th>
+                                <th style="width: 140px;">折扣价</th>
+                                <th style="width: 220px;">备注</th>
+                                <th style="width: 120px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${body || `<tr><td colspan="${1 + (viewMode === 'matrix' ? comboKeys.length : 1) + 5}" style="color:#999;">暂无SKU，请先预生成并确认添加</td></tr>`}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function setAutoSkuViewMode(mode) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            op.autoSku.viewMode = mode;
+            touchOperator(op);
+            renderAutoSkuTable();
+        }
+
+        function updateAutoSkuField(skuId, field, value) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.autoSku.skus || []).find(s => s.id === skuId);
+            if (!sku) return;
+            if (field === 'listPrice') sku.listPrice = toNumber(value, 0);
+            else if (field === 'discountPct') sku.discountPct = clamp(toNumber(value, 100), 0, 100);
+            else if (field === 'costUnit') sku.costUnit = normalizeCostUnit(op, value);
+            else if (field === 'remark') sku.remark = String(value || '');
+            sku.discountPrice = calcDiscountPrice(sku.listPrice, sku.discountPct);
+            touchOperator(op);
+            renderAutoSkuTable();
+            renderOperatorList();
+        }
+
+        // ---------------- Edit Auto SKU modal ----------------
+        function editSKU(skuId) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.autoSku.skus || []).find(s => s.id === skuId);
+            if (!sku) {
+                alert('未找到SKU');
+                return;
+            }
+
+            window.currentEditingSKU = { type: 'auto', skuId };
+            document.getElementById('editSKUId').textContent = sku.skuName;
+
+            const flat = getFlatParams(op);
+            const paramsContainer = document.getElementById('editSKUParams');
+            paramsContainer.innerHTML = '';
+            const keys = op.autoSku.selectedKeys || [];
+            const showKeys = keys.filter(k => flat[k]?.categoryKey !== 'custom');
+            showKeys.forEach(k => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex; flex-direction:column;';
+                div.innerHTML = `
+                    <label style="font-weight: 600; margin-bottom: 6px; color: #666;">${escapeHtml(flat[k]?.name || k)}</label>
+                    <div style="padding: 8px; background-color: #f5f5f5; border-radius: 4px; color: #333;">${escapeHtml(sku.params?.[k] ?? '-') }</div>
+                `;
+                paramsContainer.appendChild(div);
+            });
+
+            document.getElementById('editSKUPrice').value = sku.listPrice;
+            document.getElementById('editSKUDiscount').value = sku.discountPct;
+            document.getElementById('editSKUDiscountPrice').value = sku.discountPrice;
+            document.getElementById('editSKUMultiplier').value = sku.multiplier || 1;
+            document.getElementById('editSKURemark').value = sku.remark || '';
+
+            document.getElementById('editSKUModal').classList.add('show');
+        }
+
+        function closeEditSKUModal() {
+            document.getElementById('editSKUModal').classList.remove('show');
+            window.currentEditingSKU = null;
+        }
+
+        function calculateEditSKUDiscountPrice() {
+            const price = toNumber(document.getElementById('editSKUPrice').value, 0);
+            const discount = clamp(toNumber(document.getElementById('editSKUDiscount').value, 100), 0, 100);
+            document.getElementById('editSKUDiscountPrice').value = calcDiscountPrice(price, discount);
+        }
+
+        function saveEditedSKU() {
+            const state = window.currentEditingSKU;
+            if (!state || state.type !== 'auto') {
+                closeEditSKUModal();
+                return;
+            }
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.autoSku.skus || []).find(s => s.id === state.skuId);
+            if (!sku) return;
+
+            sku.listPrice = toNumber(document.getElementById('editSKUPrice').value, 0);
+            sku.discountPct = clamp(toNumber(document.getElementById('editSKUDiscount').value, 100), 0, 100);
+            sku.discountPrice = calcDiscountPrice(sku.listPrice, sku.discountPct);
+            sku.multiplier = toNumber(document.getElementById('editSKUMultiplier').value, 1);
+            sku.remark = String(document.getElementById('editSKURemark').value || '');
+
+            touchOperator(op);
+            closeEditSKUModal();
+            renderAutoSkuTable();
+            renderOperatorList();
+            alert('SKU修改已保存');
+        }
+
+        function deleteSKU(skuId) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.autoSku.skus || []).find(s => s.id === skuId);
+            if (!sku) return;
+            if (!confirm(`确定要删除 ${sku.skuName} 吗？`)) return;
+            op.autoSku.skus = (op.autoSku.skus || []).filter(s => s.id !== skuId);
+            touchOperator(op);
+            renderAutoSkuTable();
+            renderOperatorList();
+        }
+
+        // ---------------- Custom SKU CRUD ----------------
+        function renderCustomSkuTable() {
+            const op = getOperator(currentOperatorCode);
+            const tbody = document.getElementById('customSkuTbody');
+            if (!tbody || !op) return;
+
+            const rows = (op.customSkus || []).map(sku => `
+                <tr>
+                    <td><span class="sku-name">${escapeHtml(sku.skuName)}</span></td>
+                    <td>${escapeHtml(sku.desc || '')}</td>
+                    <td>${escapeHtml(sku.remark || '')}</td>
+                    <td><input type="number" step="0.0001" value="${escapeHtml(sku.listPrice)}" style="width: 90px;" oninput="updateCustomSkuField('${escapeHtml(sku.id)}','listPrice',this.value)"></td>
+                    <td><input type="number" value="${escapeHtml(sku.discountPct)}" style="width: 70px;" oninput="updateCustomSkuField('${escapeHtml(sku.id)}','discountPct',this.value)"></td>
+                    <td>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <input type="text" value="${escapeHtml(sku.discountPrice)}" style="width: 90px; background-color:#f5f5f5;" disabled>
+                            <select style="width: 110px;" oninput="updateCustomSkuField('${escapeHtml(sku.id)}','costUnit',this.value)">
+                                ${billingUnitOptionsHtml(normalizeCostUnit(op, sku.costUnit))}
+                            </select>
+                        </div>
+                    </td>
+                    <td><span class="sku-edit-btn" onclick="editCustomSKU('${escapeHtml(sku.id)}')">编辑</span> | <span class="sku-delete-btn" onclick="deleteCustomSKU('${escapeHtml(sku.id)}')">删除</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || `<tr><td colspan="7" style="color:#999;">暂无自定义SKU</td></tr>`;
+        }
+
+        function openAddCustomSKUModal() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            document.getElementById('customSkuModalTitle').textContent = '新增自定义SKU';
+            document.getElementById('customSkuId').value = '';
+            document.getElementById('customSkuName').value = nextSkuName(op, 'sku_custom');
+            document.getElementById('customSkuDesc').value = '';
+            document.getElementById('customSkuRemark').value = '';
+            document.getElementById('customSkuListPrice').value = 0;
+            document.getElementById('customSkuDiscount').value = 100;
+            document.getElementById('customSKUModal').classList.add('show');
+        }
+
+        function editCustomSKU(customSkuId) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.customSkus || []).find(s => s.id === customSkuId);
+            if (!sku) return;
+            document.getElementById('customSkuModalTitle').textContent = '编辑自定义SKU';
+            document.getElementById('customSkuId').value = sku.id;
+            document.getElementById('customSkuName').value = sku.skuName;
+            document.getElementById('customSkuDesc').value = sku.desc || '';
+            document.getElementById('customSkuRemark').value = sku.remark || '';
+            document.getElementById('customSkuListPrice').value = sku.listPrice;
+            document.getElementById('customSkuDiscount').value = sku.discountPct;
+            document.getElementById('customSKUModal').classList.add('show');
+        }
+
+        function closeCustomSKUModal() {
+            document.getElementById('customSKUModal').classList.remove('show');
+        }
+
+        function saveCustomSKUFromModal() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const id = document.getElementById('customSkuId').value.trim();
+            const skuName = document.getElementById('customSkuName').value.trim();
+            const desc = document.getElementById('customSkuDesc').value.trim();
+            const remark = document.getElementById('customSkuRemark').value.trim();
+            const listPrice = toNumber(document.getElementById('customSkuListPrice').value, 0);
+            const discountPct = clamp(toNumber(document.getElementById('customSkuDiscount').value, 100), 0, 100);
+            const discountPrice = calcDiscountPrice(listPrice, discountPct);
+
+            if (!skuName) {
+                alert('SKU英文名称不能为空');
+                return;
+            }
+
+            const existsName = (op.customSkus || []).some(s => s.skuName === skuName && s.id !== id);
+            if (existsName) {
+                alert('SKU英文名称已存在，请更换');
+                return;
+            }
+
+            if (id) {
+                const sku = (op.customSkus || []).find(s => s.id === id);
+                if (!sku) return;
+                sku.skuName = skuName;
+                sku.desc = desc;
+                sku.remark = remark;
+                sku.listPrice = listPrice;
+                sku.discountPct = discountPct;
+                sku.discountPrice = discountPrice;
+                sku.costUnit = normalizeCostUnit(op, sku.costUnit);
+            } else {
+                op.customSkus.push({
+                    id: uid('custom'),
+                    skuName,
+                    desc,
+                    remark,
+                    listPrice,
+                    discountPct,
+                    discountPrice,
+                    costUnit: getDefaultCostUnit(op)
+                });
+            }
+
+            touchOperator(op);
+            closeCustomSKUModal();
+            renderCustomSkuTable();
+            renderOperatorList();
+        }
+
+        function updateCustomSkuField(skuId, field, value) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.customSkus || []).find(s => s.id === skuId);
+            if (!sku) return;
+            if (field === 'listPrice') sku.listPrice = toNumber(value, 0);
+            if (field === 'discountPct') sku.discountPct = clamp(toNumber(value, 100), 0, 100);
+            if (field === 'costUnit') sku.costUnit = normalizeCostUnit(op, value);
+            sku.discountPrice = calcDiscountPrice(sku.listPrice, sku.discountPct);
+            touchOperator(op);
+            renderCustomSkuTable();
+            renderOperatorList();
+        }
+
+        function deleteCustomSKU(customSkuId) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sku = (op.customSkus || []).find(s => s.id === customSkuId);
+            if (!sku) return;
+            if (!confirm(`确定要删除 ${sku.skuName} 吗？`)) return;
+            op.customSkus = (op.customSkus || []).filter(s => s.id !== customSkuId);
+            touchOperator(op);
+            renderCustomSkuTable();
+            renderOperatorList();
+        }
+
+        // ---------------- Unit cost config ----------------
+        function renderUnitConfig() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const sel = document.getElementById('billingUnitSelect');
+            if (sel) sel.value = op.unitConfig.unit || 'times';
+            renderUnitRowsTable();
+        }
+
+        function onBillingUnitChanged(unitValue) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            op.unitConfig.unit = unitValue;
+            touchOperator(op);
+        }
+
+        function kvTextToObject(text) {
+            const obj = {};
+            const t = String(text || '').trim();
+            if (!t) return obj;
+            const parts = t.split(',').map(s => s.trim()).filter(Boolean);
+            for (const p of parts) {
+                const i = p.indexOf('=');
+                if (i < 0) continue;
+                const k = p.slice(0, i).trim();
+                const v = p.slice(i + 1).trim();
+                if (!k) continue;
+                obj[k] = v;
+            }
+            return obj;
+        }
+
+        function objectToKvText(obj) {
+            const entries = Object.entries(obj || {});
+            return entries.map(([k, v]) => `${k}=${v}`).join(', ');
+        }
+
+        function parseKeyValuesTextarea(text) {
+            const map = {};
+            const lines = String(text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+            for (const line of lines) {
+                const idx = line.indexOf('=');
+                if (idx < 0) continue;
+                const key = line.slice(0, idx).trim();
+                const rhs = line.slice(idx + 1).trim();
+                const values = rhs.split(',').map(s => s.trim()).filter(Boolean);
+                if (!key || values.length === 0) continue;
+                map[key] = values;
+            }
+            return map;
+        }
+
+        function cartesianFromMaps(inMap, outMap) {
+            const allKeys = [];
+            const allValues = [];
+            for (const k of Object.keys(inMap)) {
+                allKeys.push({ scope: 'in', key: k });
+                allValues.push(inMap[k]);
+            }
+            for (const k of Object.keys(outMap)) {
+                allKeys.push({ scope: 'out', key: k });
+                allValues.push(outMap[k]);
+            }
+            if (allKeys.length === 0) return [];
+
+            const result = [];
+            const backtrack = (i, curIn, curOut) => {
+                if (i === allKeys.length) {
+                    result.push({ inParams: { ...curIn }, outParams: { ...curOut } });
+                    return;
+                }
+                const meta = allKeys[i];
+                const values = allValues[i];
+                for (const v of values) {
+                    if (meta.scope === 'in') curIn[meta.key] = String(v);
+                    else curOut[meta.key] = String(v);
+                    backtrack(i + 1, curIn, curOut);
+                }
+                if (meta.scope === 'in') delete curIn[meta.key];
+                else delete curOut[meta.key];
+            };
+            backtrack(0, {}, {});
+            return result;
+        }
+
+        function generateUnitRowsFromParams() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const inMap = parseKeyValuesTextarea(document.getElementById('unitInParamsInput')?.value || '');
+            const outMap = parseKeyValuesTextarea(document.getElementById('unitOutParamsInput')?.value || '');
+            const combos = cartesianFromMaps(inMap, outMap);
+            if (combos.length === 0) {
+                alert('请至少输入一组入参或出参');
+                return;
+            }
+            const nextName = createSkuNameGenerator(op, 'sku_unit');
+            const newRows = combos.map((c) => ({
+                id: uid('unit'),
+                skuName: nextName(),
+                inParams: c.inParams,
+                outParams: c.outParams,
+                listPrice: 0,
+                discountPct: 100,
+                discountPrice: 0,
+                costUnit: getDefaultCostUnit(op),
+                remark: ''
+            }));
+            op.unitConfig.rows.push(...newRows);
+            touchOperator(op);
+            renderUnitRowsTable();
+            renderOperatorList();
+            alert(`已生成 ${newRows.length} 条单位成本SKU`);
+        }
+
+        function addEmptyUnitRow() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const row = {
+                id: uid('unit'),
+                skuName: nextSkuName(op, 'sku_unit'),
+                inParams: {},
+                outParams: {},
+                listPrice: 0,
+                discountPct: 100,
+                discountPrice: 0,
+                costUnit: getDefaultCostUnit(op),
+                remark: ''
+            };
+            op.unitConfig.rows.push(row);
+            touchOperator(op);
+            renderUnitRowsTable();
+            renderOperatorList();
+        }
+
+        function renderUnitRowsTable() {
+            const op = getOperator(currentOperatorCode);
+            const tbody = document.getElementById('unitSkuTbody');
+            if (!tbody || !op) return;
+
+            const rows = (op.unitConfig.rows || []).map(r => `
+                <tr>
+                    <td><input type="text" value="${escapeHtml(r.skuName)}" oninput="updateUnitRowField('${escapeHtml(r.id)}','skuName',this.value)"></td>
+                    <td><input type="text" value="${escapeHtml(objectToKvText(r.inParams))}" oninput="updateUnitRowField('${escapeHtml(r.id)}','inParams',this.value)"></td>
+                    <td><input type="text" value="${escapeHtml(objectToKvText(r.outParams))}" oninput="updateUnitRowField('${escapeHtml(r.id)}','outParams',this.value)"></td>
+                    <td><input type="number" step="0.0001" value="${escapeHtml(r.listPrice)}" oninput="updateUnitRowField('${escapeHtml(r.id)}','listPrice',this.value)"></td>
+                    <td><input type="number" value="${escapeHtml(r.discountPct)}" oninput="updateUnitRowField('${escapeHtml(r.id)}','discountPct',this.value)"></td>
+                    <td>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <input type="text" value="${escapeHtml(r.discountPrice)}" disabled style="background-color:#f5f5f5; width: 110px;">
+                            <select style="width: 110px;" oninput="updateUnitRowField('${escapeHtml(r.id)}','costUnit',this.value)">
+                                ${billingUnitOptionsHtml(normalizeCostUnit(op, r.costUnit))}
+                            </select>
+                        </div>
+                    </td>
+                    <td><input type="text" value="${escapeHtml(r.remark || '')}" oninput="updateUnitRowField('${escapeHtml(r.id)}','remark',this.value)"></td>
+                    <td><span class="sku-delete-btn" onclick="deleteUnitRow('${escapeHtml(r.id)}')">删除</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = rows || `<tr><td colspan="8" style="color:#999;">暂无单位成本SKU</td></tr>`;
+        }
+
+        function updateUnitRowField(rowId, field, value) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const row = (op.unitConfig.rows || []).find(r => r.id === rowId);
+            if (!row) return;
+            if (field === 'skuName') row.skuName = String(value || '').trim();
+            if (field === 'inParams') row.inParams = kvTextToObject(value);
+            if (field === 'outParams') row.outParams = kvTextToObject(value);
+            if (field === 'listPrice') row.listPrice = toNumber(value, 0);
+            if (field === 'discountPct') row.discountPct = clamp(toNumber(value, 100), 0, 100);
+            if (field === 'costUnit') row.costUnit = normalizeCostUnit(op, value);
+            if (field === 'remark') row.remark = String(value || '');
+            row.discountPrice = calcDiscountPrice(row.listPrice, row.discountPct);
+            touchOperator(op);
+            renderUnitRowsTable();
+            renderOperatorList();
+        }
+
+        function deleteUnitRow(rowId) {
+            const op = getOperator(currentOperatorCode);
+            if (!op) return;
+            const row = (op.unitConfig.rows || []).find(r => r.id === rowId);
+            if (!row) return;
+            if (!confirm(`确定要删除 ${row.skuName} 吗？`)) return;
+            op.unitConfig.rows = (op.unitConfig.rows || []).filter(r => r.id !== rowId);
+            touchOperator(op);
+            renderUnitRowsTable();
+            renderOperatorList();
+        }
+
+        // ---------------- Batch discount (current / all) ----------------
+        function collectSkusForOperator(op, skuType) {
+            const items = [];
+            if (skuType === 'all' || skuType === 'auto') {
+                for (const s of (op.autoSku.skus || [])) items.push({ opCode: op.code, kind: 'auto', ref: s });
+            }
+            if (skuType === 'all' || skuType === 'custom') {
+                for (const s of (op.customSkus || [])) items.push({ opCode: op.code, kind: 'custom', ref: s });
+            }
+            if (skuType === 'all' || skuType === 'unit') {
+                for (const r of (op.unitConfig.rows || [])) items.push({ opCode: op.code, kind: 'unit', ref: r });
+            }
+            return items;
+        }
+
+        function skuMatchesFilter(item, key, value) {
+            if (!key || key === '__all__') return true;
+            const v = String(value || '').trim();
+            if (!v) return true;
+
+            if (item.kind === 'auto') {
+                return String(item.ref.params?.[key] ?? '').trim() === v;
+            }
+            if (item.kind === 'unit') {
+                return String(item.ref.inParams?.[key] ?? item.ref.outParams?.[key] ?? '').trim() === v;
+            }
+            // custom skus: no params, only allow filter by skuName when key==skuName
+            if (item.kind === 'custom') {
+                if (key === 'skuName') return String(item.ref.skuName || '') === v;
+                return false;
+            }
+            return false;
+        }
+
+        function showBatchPreview() {
+            const scope = document.getElementById('batchScopeSelect')?.value || 'current';
+            const skuType = document.getElementById('batchSkuTypeSelect')?.value || 'all';
+            const newDiscount = clamp(toNumber(document.getElementById('batchNewDiscountInput')?.value, NaN), 0, 100);
+            const filters = collectBatchFilters('batch');
+
+            if (!Number.isFinite(newDiscount)) {
+                alert('请输入新折扣（0-100）');
+                return;
+            }
+
+            let ops = [];
+            if (scope === 'all') ops = store.operators;
+            else if (scope === 'vendor') {
+                const cur = getOperator(currentOperatorCode);
+                if (!cur) return;
+                const v = String(cur.vendor || '').trim();
+                if (!v) {
+                    alert('当前算子未配置厂商（vendor），无法按厂商范围批量操作');
+                    return;
+                }
+                ops = store.operators.filter(o => String(o.vendor || '').trim() === v);
+            } else {
+                const op = getOperator(currentOperatorCode);
+                if (!op) return;
+                ops = [op];
+            }
+
+            const matches = [];
+            for (const op of ops) {
+                for (const item of collectSkusForOperator(op, skuType)) {
+                    if (skuMatchesAllFilters(item, filters)) matches.push(item);
+                }
+            }
+
+            batchPreviewMatches = { matches, newDiscount };
+            const msgEl = document.getElementById('batchPreviewMsg');
+            const previewEl = document.getElementById('batchPreview');
+            previewEl.style.display = 'block';
+
+            if (matches.length === 0) {
+                msgEl.innerHTML = `<strong>批量更改预览：</strong><br>没有匹配到任何SKU。`;
+                return;
+            }
+
+            const samples = matches.slice(0, 6).map(m => {
+                const lp = toNumber(m.ref.listPrice, 0);
+                const oldDp = calcDiscountPrice(lp, m.ref.discountPct);
+                const newDp = calcDiscountPrice(lp, newDiscount);
+                return `• [${m.opCode}] ${escapeHtml(m.ref.skuName)}: ${oldDp} → ${newDp}`;
+            }).join('<br>');
+
+            msgEl.innerHTML = `<strong>批量更改预览：</strong><br>
+                将更改 <strong>${matches.length}</strong> 个SKU 的折扣为 <strong>${newDiscount}%</strong>（刊例价 × 折扣 = 折扣价）<br>
+                ${samples}${matches.length > 6 ? '<br>…' : ''}`;
+        }
+
+        function confirmBatchDiscount() {
+            if (!batchPreviewMatches) return;
+            const { matches, newDiscount } = batchPreviewMatches;
+            for (const m of matches) {
+                m.ref.discountPct = newDiscount;
+                m.ref.discountPrice = calcDiscountPrice(m.ref.listPrice, newDiscount);
+            }
+            // touch involved operators
+            const touched = new Set(matches.map(m => m.opCode));
+            for (const code of touched) {
+                const op = getOperator(code);
+                if (op) op.updatedAt = nowIso();
+            }
+            saveStore();
+            batchPreviewMatches = null;
+            document.getElementById('batchPreview').style.display = 'none';
+            renderAllOperatorViews();
+            renderOperatorList();
+            alert('批量折扣调整已完成！');
+        }
+
+        function cancelBatchDiscount() {
+            batchPreviewMatches = null;
+            document.getElementById('batchPreview').style.display = 'none';
+        }
+
+        // ---------------- Global batch modal ----------------
+        function openGlobalBatchDiscountModal() {
+            updateBatchFilterKeyOptions();
+            ensureBatchFiltersUI();
+            document.getElementById('globalBatchDiscountModal').classList.add('show');
+        }
+
+        function closeGlobalBatchDiscountModal() {
+            document.getElementById('globalBatchDiscountModal').classList.remove('show');
+        }
+
+        function showGlobalBatchPreview() {
+            const skuType = document.getElementById('globalBatchSkuTypeSelect')?.value || 'all';
+            const filters = collectBatchFilters('global');
+            const newDiscount = clamp(toNumber(document.getElementById('globalBatchNewDiscountInput')?.value, NaN), 0, 100);
+            if (!Number.isFinite(newDiscount)) {
+                alert('请输入新折扣（0-100）');
+                return;
+            }
+            const matches = [];
+            for (const op of store.operators) {
+                for (const item of collectSkusForOperator(op, skuType)) {
+                    if (skuMatchesAllFilters(item, filters)) matches.push(item);
+                }
+            }
+            globalBatchPreviewMatches = { matches, newDiscount };
+
+            const box = document.getElementById('globalBatchPreview');
+            const msg = document.getElementById('globalBatchPreviewMsg');
+            box.style.display = 'block';
+            if (matches.length === 0) {
+                msg.innerHTML = `<strong>预览：</strong><br>没有匹配到任何SKU。`;
+                return;
+            }
+            const samples = matches.slice(0, 6).map(m => {
+                const lp = toNumber(m.ref.listPrice, 0);
+                const newDp = calcDiscountPrice(lp, newDiscount);
+                return `• [${m.opCode}] ${escapeHtml(m.ref.skuName)} → ${newDp}`;
+            }).join('<br>');
+            msg.innerHTML = `<strong>预览：</strong><br>
+                将更改 <strong>${matches.length}</strong> 个SKU 的折扣为 <strong>${newDiscount}%</strong><br>
+                ${samples}${matches.length > 6 ? '<br>…' : ''}`;
+        }
+
+        function confirmGlobalBatchDiscount() {
+            if (!globalBatchPreviewMatches) return;
+            const { matches, newDiscount } = globalBatchPreviewMatches;
+            for (const m of matches) {
+                m.ref.discountPct = newDiscount;
+                m.ref.discountPrice = calcDiscountPrice(m.ref.listPrice, newDiscount);
+            }
+            const touched = new Set(matches.map(m => m.opCode));
+            for (const code of touched) {
+                const op = getOperator(code);
+                if (op) op.updatedAt = nowIso();
+            }
+            saveStore();
+            globalBatchPreviewMatches = null;
+            document.getElementById('globalBatchPreview').style.display = 'none';
+            closeGlobalBatchDiscountModal();
+            renderAllOperatorViews();
+            renderOperatorList();
+            alert('全局批量折扣调整已完成！');
+        }
+
+        function cancelGlobalBatchDiscount() {
+            globalBatchPreviewMatches = null;
+            document.getElementById('globalBatchPreview').style.display = 'none';
+        }
+
+        // ---------------- Import / Export ----------------
+        function downloadText(filename, content, mime = 'application/json;charset=utf-8') {
+            const blob = new Blob([content], { type: mime });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }, 0);
+        }
+
+        function exportData() {
+            downloadText(`cost-config-all-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(store, null, 2));
+        }
+
+        function exportOperatorData() {
+            const op = getOperator(currentOperatorCode);
+            if (!op) {
+                alert('请先进入某个算子配置页');
+                return;
+            }
+            // Export both JSON and CSV-friendly format
+            downloadText(`cost-config-${op.code}-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(op, null, 2));
+            downloadText(`cost-config-${op.code}-${new Date().toISOString().slice(0,10)}.csv`, buildOperatorCSV(op), 'text/csv;charset=utf-8');
+        }
+
+        function csvEscape(value) {
+            const s = String(value ?? '');
+            if (/[\n\r,\"]/g.test(s)) {
+                return '"' + s.replaceAll('"', '""') + '"';
+            }
+            return s;
+        }
+
+        function buildOperatorCSV(op) {
+            const rows = [];
+            rows.push([
+                'operatorCode',
+                'skuType',
+                'skuName',
+                'unit',
+                'paramsJson',
+                'inParamsJson',
+                'outParamsJson',
+                'listPrice',
+                'discountPct',
+                'discountPrice',
+                'remark',
+                'desc'
+            ]);
+
+            for (const s of (op.autoSku.skus || [])) {
+                rows.push([op.code, 'auto', s.skuName, s.costUnit || '', JSON.stringify(s.params || {}), '', '', s.listPrice, s.discountPct, s.discountPrice, s.remark || '', '']);
+            }
+            for (const s of (op.customSkus || [])) {
+                rows.push([op.code, 'custom', s.skuName, s.costUnit || '', '', '', '', s.listPrice, s.discountPct, s.discountPrice, s.remark || '', s.desc || '']);
+            }
+            for (const r of (op.unitConfig.rows || [])) {
+                rows.push([op.code, 'unit', r.skuName, r.costUnit || op.unitConfig.unit || '', '', JSON.stringify(r.inParams || {}), JSON.stringify(r.outParams || {}), r.listPrice, r.discountPct, r.discountPrice, r.remark || '', '']);
+            }
+
+            return rows.map(cols => cols.map(csvEscape).join(',')).join('\n');
+        }
+
+        function openImportModal() {
+            pendingImport = null;
+            document.getElementById('importModal').classList.add('show');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('show');
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const files = event.dataTransfer?.files;
+            handleImportFileSelected(files);
+        }
+
+        function handleImportFileSelected(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                const text = String(reader.result || '');
+                const name = (file.name || '').toLowerCase();
+                try {
+                    if (name.endsWith('.json')) {
+                        pendingImport = { kind: 'json', data: JSON.parse(text) };
+                        alert('已加载 JSON，点击“确认导入”生效');
+                        return;
+                    }
+                    if (name.endsWith('.csv')) {
+                        pendingImport = { kind: 'csv', data: parseCsv(text) };
+                        alert('已加载 CSV，点击“确认导入”生效');
+                        return;
+                    }
+                    alert('暂不支持该文件格式');
+                } catch (e) {
+                    alert('解析文件失败：' + (e?.message || '未知错误'));
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function getImportMode() {
+            const radios = document.querySelectorAll('input[name="importType"]');
+            for (const r of radios) {
+                if (r.checked) return r.value;
+            }
+            return 'merge';
+        }
+
+        function confirmImport() {
+            if (!pendingImport) {
+                alert('请先选择文件');
+                return;
+            }
+            const mode = getImportMode();
+            if (pendingImport.kind === 'json') {
+                applyJsonImport(pendingImport.data, mode);
+                closeImportModal();
+                renderOperatorList();
+                alert('导入完成');
+                return;
+            }
+            if (pendingImport.kind === 'csv') {
+                applyCsvImport(pendingImport.data, mode);
+                closeImportModal();
+                renderOperatorList();
+                alert('导入完成');
+                return;
+            }
+        }
+
+        function applyJsonImport(data, mode) {
+            // Accept either full store or single operator
+            if (data && Array.isArray(data.operators)) {
+                if (mode === 'replace') {
+                    store = data;
+                } else {
+                    // merge by operator code
+                    for (const op of data.operators) {
+                        const existing = getOperator(op.code);
+                        if (!existing) {
+                            store.operators.push(op);
+                        } else {
+                            Object.assign(existing, op);
+                        }
+                    }
+                }
+                saveStore();
+                return;
+            }
+
+            if (data && data.code) {
+                const existing = getOperator(data.code);
+                if (mode === 'replace' || !existing) {
+                    if (existing) {
+                        const idx = store.operators.findIndex(o => o.code === data.code);
+                        store.operators[idx] = data;
+                    } else {
+                        store.operators.push(data);
+                    }
+                } else {
+                    Object.assign(existing, data);
+                }
+                saveStore();
+                return;
+            }
+
+            throw new Error('JSON结构不符合预期');
+        }
+
+        function parseCsv(text) {
+            const rows = [];
+            let i = 0;
+            const s = String(text || '');
+            let row = [];
+            let cur = '';
+            let inQuotes = false;
+            while (i < s.length) {
+                const ch = s[i];
+                if (inQuotes) {
+                    if (ch === '"') {
+                        if (s[i + 1] === '"') {
+                            cur += '"';
+                            i += 2;
+                            continue;
+                        }
+                        inQuotes = false;
+                        i += 1;
+                        continue;
+                    }
+                    cur += ch;
+                    i += 1;
+                    continue;
+                }
+                if (ch === '"') {
+                    inQuotes = true;
+                    i += 1;
+                    continue;
+                }
+                if (ch === ',') {
+                    row.push(cur);
+                    cur = '';
+                    i += 1;
+                    continue;
+                }
+                if (ch === '\n') {
+                    row.push(cur);
+                    rows.push(row);
+                    row = [];
+                    cur = '';
+                    i += 1;
+                    continue;
+                }
+                if (ch === '\r') {
+                    i += 1;
+                    continue;
+                }
+                cur += ch;
+                i += 1;
+            }
+            row.push(cur);
+            rows.push(row);
+            return rows;
+        }
+
+        function applyCsvImport(rows, mode) {
+            if (!rows || rows.length < 2) throw new Error('CSV为空');
+            const header = rows[0].map(h => h.trim());
+            const idx = (name) => header.indexOf(name);
+            const opCodeIdx = idx('operatorCode');
+            const typeIdx = idx('skuType');
+            const nameIdx = idx('skuName');
+            const unitIdx = idx('unit');
+            const paramsIdx = idx('paramsJson');
+            const inIdx = idx('inParamsJson');
+            const outIdx = idx('outParamsJson');
+            const lpIdx = idx('listPrice');
+            const dIdx = idx('discountPct');
+            const dpIdx = idx('discountPrice');
+            const remarkIdx = idx('remark');
+            const descIdx = idx('desc');
+
+            if (opCodeIdx < 0 || typeIdx < 0 || nameIdx < 0) throw new Error('CSV表头不符合预期');
+
+            const byOp = new Map();
+            for (let r = 1; r < rows.length; r++) {
+                const line = rows[r];
+                const opCode = (line[opCodeIdx] || '').trim();
+                const skuType = (line[typeIdx] || '').trim();
+                const skuName = (line[nameIdx] || '').trim();
+                if (!opCode || !skuType || !skuName) continue;
+                if (!byOp.has(opCode)) byOp.set(opCode, []);
+                byOp.get(opCode).push({
+                    opCode,
+                    skuType,
+                    skuName,
+                    unit: unitIdx >= 0 ? (line[unitIdx] || '').trim() : '',
+                    paramsJson: paramsIdx >= 0 ? (line[paramsIdx] || '') : '',
+                    inParamsJson: inIdx >= 0 ? (line[inIdx] || '') : '',
+                    outParamsJson: outIdx >= 0 ? (line[outIdx] || '') : '',
+                    listPrice: lpIdx >= 0 ? toNumber(line[lpIdx], 0) : 0,
+                    discountPct: dIdx >= 0 ? clamp(toNumber(line[dIdx], 100), 0, 100) : 100,
+                    discountPrice: dpIdx >= 0 ? toNumber(line[dpIdx], 0) : 0,
+                    remark: remarkIdx >= 0 ? (line[remarkIdx] || '') : '',
+                    desc: descIdx >= 0 ? (line[descIdx] || '') : ''
+                });
+            }
+
+            for (const [opCode, items] of byOp.entries()) {
+                let op = getOperator(opCode);
+                if (!op) {
+                    op = makeDefaultOperator(opCode, opCode, '');
+                    store.operators.push(op);
+                }
+                if (mode === 'replace') {
+                    op.autoSku.skus = [];
+                    op.customSkus = [];
+                    op.unitConfig.rows = [];
+                }
+                for (const it of items) {
+                    if (it.skuType === 'auto') {
+                        op.autoSku.skus.push({
+                            id: uid('auto'),
+                            skuName: it.skuName,
+                            params: safeJson(it.paramsJson) || {},
+                            listPrice: it.listPrice,
+                            discountPct: it.discountPct,
+                            discountPrice: calcDiscountPrice(it.listPrice, it.discountPct),
+                            costUnit: normalizeCostUnit(op, it.unit || op.unitConfig.unit),
+                            remark: it.remark || ''
+                        });
+                    }
+                    if (it.skuType === 'custom') {
+                        op.customSkus.push({
+                            id: uid('custom'),
+                            skuName: it.skuName,
+                            desc: it.desc || '',
+                            remark: it.remark || '',
+                            listPrice: it.listPrice,
+                            discountPct: it.discountPct,
+                            discountPrice: calcDiscountPrice(it.listPrice, it.discountPct),
+                            costUnit: normalizeCostUnit(op, it.unit || op.unitConfig.unit)
+                        });
+                    }
+                    if (it.skuType === 'unit') {
+                        if (it.unit) op.unitConfig.unit = it.unit;
+                        op.unitConfig.rows.push({
+                            id: uid('unit'),
+                            skuName: it.skuName,
+                            inParams: safeJson(it.inParamsJson) || {},
+                            outParams: safeJson(it.outParamsJson) || {},
+                            listPrice: it.listPrice,
+                            discountPct: it.discountPct,
+                            discountPrice: calcDiscountPrice(it.listPrice, it.discountPct),
+                            costUnit: normalizeCostUnit(op, it.unit || op.unitConfig.unit),
+                            remark: it.remark || ''
+                        });
+                    }
+                }
+                op.updatedAt = nowIso();
+            }
+            saveStore();
+        }
+
+        function safeJson(s) {
+            try {
+                if (!s) return null;
+                return JSON.parse(s);
+            } catch {
+                return null;
+            }
+        }
+
+        // ---------------- Preview modal ----------------
+        function openPreviewModal(operatorCode) {
+            const op = getOperator(operatorCode);
+            if (!op) return;
+            const rows = [];
+            for (const s of (op.autoSku.skus || []).slice(0, 50)) {
+                rows.push([s.skuName, JSON.stringify(s.params || {}), s.listPrice, `${s.discountPct}%`, s.discountPrice]);
+            }
+            for (const s of (op.customSkus || []).slice(0, 50)) {
+                rows.push([s.skuName, s.desc || '', s.listPrice, `${s.discountPct}%`, s.discountPrice]);
+            }
+            for (const r of (op.unitConfig.rows || []).slice(0, 50)) {
+                rows.push([r.skuName, `in:${objectToKvText(r.inParams)} | out:${objectToKvText(r.outParams)} | unit:${BILLING_UNITS[op.unitConfig.unit] || op.unitConfig.unit}`, r.listPrice, `${r.discountPct}%`, r.discountPrice]);
+            }
+
+            const tbody = document.getElementById('previewTableBody');
+            tbody.innerHTML = rows.map(row => `<tr><td>${escapeHtml(row[0])}</td><td>${escapeHtml(row[1])}</td><td>${escapeHtml(row[2])}</td><td>${escapeHtml(row[3])}</td><td>${escapeHtml(row[4])}</td></tr>`).join('')
+                || `<tr><td colspan="5" style="color:#999;">暂无SKU</td></tr>`;
+
+            document.getElementById('previewModal').classList.add('show');
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+
+        // ---------------- Save buttons (demo) ----------------
+        function saveDraft() {
+            alert('已保存草稿（本地存储）');
+        }
+
+        function saveConfig() {
+            alert('已保存配置（本地存储）');
+        }
+
+        // ---------------- Modal outside click ----------------
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        };
+
+        // ---------------- Boot ----------------
+        document.addEventListener('DOMContentLoaded', function() {
+            store = loadStore();
+            // Seed demo SKUs only when an operator has no cost rows at all.
+            for (const op of (store?.operators || [])) seedDemoAutoSkusIfOperatorEmpty(op);
+            saveStore();
+            updateBatchFilterKeyOptions();
+            ensureBatchFiltersUI();
+            renderOperatorList();
+        });
+    </script>
+</body>
+</html>

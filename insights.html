@@ -1,0 +1,72 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Insights | 崔茹</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="hover:text-deep" href="index.html">Home</a>
+          <a class="hover:text-deep" href="experience.html">Experience</a>
+          <a class="hover:text-deep" href="projects.html">Projects</a>
+          <a class="hover:text-deep" href="methodology.html">Methodology</a>
+          <a class="hover:text-deep" href="insights.html">Insights</a>
+          <a class="hover:text-deep" href="resume.html">Resume</a>
+          <a class="hover:text-deep" href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Insights -->
+    <section class="mx-auto max-w-6xl px-6 py-16 space-y-10">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-slate-400">Insights</p>
+        <h1 class="text-3xl md:text-4xl font-semibold">文章与观点</h1>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <article class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+          <h2 class="font-semibold text-lg">AI Agent 在企业中的落地路径</h2>
+          <p class="text-slate-600 mt-3">占位摘要：从试点到规模化的关键条件与协作路径。</p>
+        </article>
+        <article class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+          <h2 class="font-semibold text-lg">规则引擎在平台型产品中的价值</h2>
+          <p class="text-slate-600 mt-3">占位摘要：规则体系如何提升稳定性与扩展性。</p>
+        </article>
+        <article class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+          <h2 class="font-semibold text-lg">中后台产品与C端产品的差异</h2>
+          <p class="text-slate-600 mt-3">占位摘要：从目标、流程与协作方式的对比。</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Methodology | 崔茹</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="hover:text-deep" href="index.html">Home</a>
+          <a class="hover:text-deep" href="experience.html">Experience</a>
+          <a class="hover:text-deep" href="projects.html">Projects</a>
+          <a class="hover:text-deep" href="methodology.html">Methodology</a>
+          <a class="hover:text-deep" href="insights.html">Insights</a>
+          <a class="hover:text-deep" href="resume.html">Resume</a>
+          <a class="hover:text-deep" href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Methodology -->
+    <section class="mx-auto max-w-6xl px-6 py-16 space-y-8">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-slate-400">Methodology</p>
+        <h1 class="text-3xl md:text-4xl font-semibold">我的产品方法框架</h1>
+        <p class="text-slate-600 mt-2">产品的稳定性, 来自结构清晰的规则体系</p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="border border-slate-100 rounded-lg p-6">
+          <div class="text-bright font-semibold">阶段 1</div>
+          <h2 class="mt-2 text-xl font-semibold">问题抽象</h2>
+          <p class="text-slate-600 mt-2">聚焦用户目标与业务约束, 建立统一问题模型。</p>
+        </div>
+        <div class="border border-slate-100 rounded-lg p-6">
+          <div class="text-bright font-semibold">阶段 2</div>
+          <h2 class="mt-2 text-xl font-semibold">系统建模</h2>
+          <p class="text-slate-600 mt-2">拆解系统模块与流程, 建立可扩展架构。</p>
+        </div>
+        <div class="border border-slate-100 rounded-lg p-6">
+          <div class="text-bright font-semibold">阶段 3</div>
+          <h2 class="mt-2 text-xl font-semibold">规则设计</h2>
+          <p class="text-slate-600 mt-2">输出规则与策略集合, 保障逻辑稳定与复用。</p>
+        </div>
+        <div class="border border-slate-100 rounded-lg p-6">
+          <div class="text-bright font-semibold">阶段 4</div>
+          <h2 class="mt-2 text-xl font-semibold">数据验证</h2>
+          <p class="text-slate-600 mt-2">通过数据验证与迭代优化形成闭环。</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-100 rounded-lg h-56 flex items-center justify-center text-slate-400">
+        方法框架示意图占位
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

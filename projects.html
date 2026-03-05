@@ -1,0 +1,188 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects | 崔茹</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="hover:text-deep" href="index.html">Home</a>
+          <a class="hover:text-deep" href="experience.html">Experience</a>
+          <a class="hover:text-deep" href="projects.html">Projects</a>
+          <a class="hover:text-deep" href="methodology.html">Methodology</a>
+          <a class="hover:text-deep" href="insights.html">Insights</a>
+          <a class="hover:text-deep" href="resume.html">Resume</a>
+          <a class="hover:text-deep" href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Projects -->
+    <section class="mx-auto max-w-6xl px-6 py-16 space-y-12">
+      <!-- Intro -->
+      <div class="rounded-2xl border border-slate-100 px-8 py-10 bg-gradient-to-br from-slate-50 to-white">
+        <p class="text-sm uppercase tracking-widest text-slate-400">Projects & Cases</p>
+        <h1 class="text-3xl md:text-4xl font-semibold mt-2">项目与案例</h1>
+        <p class="text-slate-600 mt-3">探索 AI 平台、用户研究、内容产品与场景化设计</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-3">
+        <button class="filter-btn px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:border-bright hover:text-bright transition" data-filter="all">全部</button>
+        <button class="filter-btn px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:border-bright hover:text-bright transition" data-filter="ai-platform">AI 平台与 ToB 系统设计</button>
+        <button class="filter-btn px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:border-bright hover:text-bright transition" data-filter="toc">用户洞察与 ToC 产品</button>
+        <button class="filter-btn px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:border-bright hover:text-bright transition" data-filter="content">内容产品运营</button>
+        <button class="filter-btn px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:border-bright hover:text-bright transition" data-filter="aesthetic">设计与审美表达</button>
+      </div>
+
+      <!-- Project Cards -->
+      <div class="grid gap-6 md:grid-cols-2">
+        <article id="work-ai-platform" class="project-card border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition" data-category="ai-platform">
+          <div class="h-48 bg-slate-100 flex items-center justify-center text-slate-400">项目配图 / 原型</div>
+          <div class="p-6 space-y-3">
+            <div class="text-sm text-slate-500">万兴科技 | AI 产品策划经理 | 2026.01 – 2026.04</div>
+            <h3 class="text-xl font-semibold">AI 平台与 ToB 系统设计</h3>
+            <p class="text-slate-600">多维度 SKU 自动化配置系统 &amp; 规则引擎</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>提升操作效率 80%，显著降低人工成本</li>
+              <li>协调开发/算法/运营团队，实现功能按时上线</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-ai-platform">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-user" class="project-card border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition" data-category="toc">
+          <div class="h-48 bg-slate-100 flex items-center justify-center text-slate-400">项目配图 / 原型</div>
+          <div class="p-6 space-y-3">
+            <div class="text-sm text-slate-500">智能冰箱管理网站 | AI 产品经理 | 个人项目 | 2025.08 – 2025.12</div>
+            <h3 class="text-xl font-semibold">用户洞察与 ToC 产品</h3>
+            <p class="text-slate-600">AI 算法智能提醒与个性化推荐，提高食材管理效率</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>独立完成产品规划、原型设计与前端功能实现</li>
+              <li>收集用户数据并持续优化功能，迭代满足需求</li>
+              <li>跟踪竞品与生活类应用趋势，优化产品策略</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-user">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-content" class="project-card border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition" data-category="content">
+          <div class="h-48 bg-slate-100 flex items-center justify-center text-slate-400">项目配图 / 截图</div>
+          <div class="p-6 space-y-3">
+            <div class="text-sm text-slate-500">小红书内容产品 | 内容产品经理 | 2023.12 – 至今</div>
+            <h3 class="text-xl font-semibold">内容产品运营</h3>
+            <p class="text-slate-600">内容结构优化 + 数据分析，构建商业闭环</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>发布 650+ 篇笔记，粉丝 4.4w，互动率 3% → 8%</li>
+              <li>与 100+ 品牌合作，实现 80+ 商业合作</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-content">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-home" class="project-card border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition" data-category="aesthetic">
+          <div class="h-48 bg-slate-100 flex items-center justify-center text-slate-400">项目配图 / 场景</div>
+          <div class="p-6 space-y-3">
+            <div class="text-sm text-slate-500">家居场景化产品定制 | 产品经理 | 2025.06 – 2025.11</div>
+            <h3 class="text-xl font-semibold">设计与审美表达</h3>
+            <p class="text-slate-600">用户深访 + 定制场景设计</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>协调施工 / 材料 / 智能设备团队落地</li>
+              <li>用户满意度 92%，智能设备适配率 98%</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-home">查看详情 →</a>
+          </div>
+        </article>
+      </div>
+
+      <!-- Visual / Content Expression -->
+      <section class="space-y-4" id="visual">
+        <h2 class="text-2xl font-semibold">视觉 / 内容表达</h2>
+        <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-content">
+            <div class="h-48 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">小红书 Vlog 截图</div>
+          </a>
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-user">
+            <div class="h-60 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">用户研究笔记</div>
+          </a>
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-ai-platform">
+            <div class="h-52 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">系统架构草图</div>
+          </a>
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-home">
+            <div class="h-56 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">场景化产品图</div>
+          </a>
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-content">
+            <div class="h-44 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">内容方法论卡片</div>
+          </a>
+          <a class="block break-inside-avoid rounded-lg overflow-hidden border border-slate-100 hover:shadow-md transition" href="#work-user">
+            <div class="h-60 bg-slate-100"></div>
+            <div class="p-4 text-sm text-slate-600">洞察报告截图</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="rounded-2xl border border-slate-100 p-8 md:p-10" id="cta">
+        <h2 class="text-2xl font-semibold">想了解我的研究方法与更多项目细节？</h2>
+        <div class="flex flex-wrap gap-4 mt-6">
+          <a class="px-6 py-3 bg-bright text-white rounded-md hover:opacity-90 transition" href="insights.html">Insights</a>
+          <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="resume.html">About Me</a>
+          <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="contact.html">Contact Me</a>
+        </div>
+      </section>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+  <script>
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+    const setActive = (btn) => {
+      filterButtons.forEach(b => b.classList.remove('border-bright', 'text-bright'));
+      btn.classList.add('border-bright', 'text-bright');
+    };
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+        setActive(btn);
+        projectCards.forEach(card => {
+          const show = filter === 'all' || card.dataset.category === filter;
+          card.classList.toggle('hidden', !show);
+        });
+      });
+    });
+    if (filterButtons.length) setActive(filterButtons[0]);
+  </script>
+</body>
+</html>

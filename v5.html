@@ -1,0 +1,935 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>冰箱管家</title>
+  <style>
+    :root{--p:#4CAF82;--s:#FF8C42;--bg:#F8F5F0;--card:#fff;--t:#333;--m:#888;--danger:#FF5252;--warn:#FFB300;--shadow:0 10px 25px rgba(0,0,0,.08);--r:20px;--nav:72px;--safe:env(safe-area-inset-bottom);--font:"Nunito","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+    [data-theme="dark"]{--bg:#121212;--card:#1E1E1E;--t:#EDEDED;--m:#A0A0A0;--shadow:0 10px 25px rgba(0,0,0,.35)}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:radial-gradient(1200px 800px at 10% -10%,#fff 0%,var(--bg) 55%);color:var(--t);font-family:var(--font)}
+    .app{max-width:480px;margin:0 auto;min-height:100%;padding-bottom:calc(var(--nav) + var(--safe));animation:fadeIn .5s}
+    .frame{max-width:520px;margin:24px auto;padding:12px;border-radius:34px;background:linear-gradient(145deg,#f1f1f1,#fff);box-shadow:0 20px 40px rgba(0,0,0,.12)}
+    @media(max-width:560px){.frame{padding:0;background:transparent;box-shadow:none;margin:0}}
+    .page{padding:18px 16px 8px;display:none;animation:fadeIn .35s} .page.active{display:block}
+    .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:14px;transition:transform .18s ease, box-shadow .18s ease}
+    .card.float:hover{transform:translateY(-4px);transition:.18s}
+    .card:active{transform:translateY(1px)}
+    .row{display:flex;gap:10px;align-items:center} .space{justify-content:space-between}
+    .pill{padding:4px 10px;border-radius:999px;background:#eaf7f1;color:var(--p);font-size:12px;font-weight:700}
+    .btn{border:0;background:var(--p);color:#fff;padding:10px 14px;border-radius:14px;font-weight:700;cursor:pointer;min-height:44px;transition:transform .12s,box-shadow .2s;box-shadow:0 6px 16px rgba(76,175,130,.35)}
+    .btn.secondary{background:var(--s);box-shadow:0 6px 16px rgba(255,140,66,.35)}
+    .btn.ghost{background:transparent;color:var(--t);border:1px dashed rgba(0,0,0,.15);box-shadow:none}
+    .btn:active{transform:scale(.97)}
+    .title{font-size:18px;font-weight:800} .sec{font-size:15px;font-weight:800;margin:4px 0 10px}
+    .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(480px,100%);height:calc(var(--nav) + var(--safe));background:var(--card);box-shadow:0 -10px 25px rgba(0,0,0,.08);border-radius:20px 20px 0 0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding-bottom:var(--safe);z-index:20}
+    .nav .tab{text-align:center;font-size:12px;color:var(--m);cursor:pointer;min-height:64px;display:flex;align-items:center;justify-content:center;position:relative} 
+    .nav .tab.active{color:var(--p);font-weight:800}
+    .nav .tab.pressed{transform:scale(.96)}
+    .nav .tab::after{content:"";position:absolute;bottom:8px;left:50%;width:6px;height:6px;border-radius:50%;background:var(--p);transform:translateX(-50%) scale(0);transition:.2s}
+    .nav .tab.active::after{transform:translateX(-50%) scale(1)}
+    .nav .plus{margin-top:-28px} .nav .plus .btn{width:58px;height:58px;border-radius:50%;padding:0;font-size:24px}
+    .welcome{background:linear-gradient(135deg,#6ed3a6,var(--p));color:#fff} .welcome .pill{background:rgba(255,255,255,.2);color:#fff}
+    .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} .stat .card{text-align:center;padding:10px 6px;border-radius:16px;background:#f1fbf6;font-weight:800}
+    .progress{height:8px;background:#f0f0f0;border-radius:999px;overflow:hidden} .progress span{display:block;height:100%;background:var(--p)}
+    .scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+    .recipe{min-width:160px;background:var(--card);border-radius:18px;padding:12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease}
+    .recipe:active{transform:scale(.98)}
+    .tabs{display:flex;gap:10px;overflow-x:auto;margin-bottom:10px}
+    .tab-pill{white-space:nowrap;padding:8px 12px;border-radius:999px;background:#f1f1f1;font-size:12px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center}
+    .tab-pill.active{background:var(--p);color:#fff;font-weight:800}
+    .grid2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media(max-width:420px){.grid2{grid-template-columns:repeat(2,1fr)}}
+    .food{background:var(--card);border-radius:16px;padding:8px;box-shadow:var(--shadow);position:relative;min-height:96px;transition:transform .18s ease}
+    .food:active{transform:scale(.98)}
+    .food .emoji{font-size:26px;text-align:center} .food .name{font-weight:800;font-size:14px;text-align:center}
+    .tag{font-size:10px;padding:2px 6px;border-radius:999px;display:inline-block}
+    .tag.ok{background:#e7f7ee;color:#2e8b57} .tag.warn{background:#fff2d6;color:#c47d00;animation:blink 1.2s infinite} .tag.bad{background:#ffe0e0;color:#c0392b}
+    .acts{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:.6}
+    .icon{border:1px solid #e6e6e6;background:transparent;border-radius:6px;padding:2px 4px;cursor:pointer;min-height:22px;font-size:11px;color:var(--m)}
+    #soonList .row{font-size:12px}
+    .search{display:flex;gap:8px;margin-bottom:10px} .search input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid #e3e3e3;font-size:14px;min-height:44px;background:var(--card);color:var(--t)}
+    .empty{text-align:center;padding:30px 10px;color:var(--m)} .empty .emoji{font-size:40px}
+    .form{display:grid;grid-template-columns:1fr 1fr;gap:10px} .form .full{grid-column:1/-1}
+    .form label{font-size:12px;color:var(--m);display:block;margin:4px 0 6px}
+    .form input,.form select,.form textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #e2e2e2;font-size:14px;min-height:44px;background:var(--card);color:var(--t)}
+    .upload{border:2px dashed #d8d8d8;border-radius:16px;padding:16px;text-align:center;color:var(--m)}
+    .preview{width:100%;border-radius:16px;margin-top:10px}
+    .subtabs{display:flex;gap:8px;margin-bottom:10px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .sub{padding:8px 12px;border-radius:999px;background:#f1f1f1;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+    .sub.active{background:var(--p);color:#fff;font-weight:800}
+    .line{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);margin-bottom:8px;cursor:pointer;transition:transform .18s ease}
+    .line:active{transform:scale(.99)}
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;font-size:11px}
+    .cell{background:var(--card);border-radius:10px;padding:6px;min-height:54px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease}
+    .cell:active{transform:scale(.98)}
+    .lib .card{display:flex;gap:10px;align-items:center}
+    .lib-emoji{width:64px;height:64px;border-radius:16px;background:#fff3e6;display:flex;align-items:center;justify-content:center;font-size:26px}
+    .toast{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:var(--card);color:var(--t);padding:10px 16px;border-radius:999px;box-shadow:var(--shadow);z-index:30;transition:top .3s}
+    .toast.show{top:20px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);display:none;z-index:40}
+    .modal.active{display:block}
+    .panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:24px 24px 0 0;padding:16px;max-height:92%;overflow-y:auto;animation:up .3s}
+    .module{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:10px;margin-bottom:10px}
+    .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .info-chip{background:#f1fbf6;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:700}
+    [data-theme="dark"] .info-chip{background:#1b2a25}
+    .fridge-layout{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .fridge-layout.haier{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(6,60px);gap:8px}
+    .fridge-cell{border:2px dashed #e2e2e2;border-radius:14px;padding:10px;min-height:70px;position:relative;background:linear-gradient(180deg,#ffffff,#f7faf8)}
+    .fridge-cell.fridge{grid-column:1 / span 2;grid-row:1 / span 2}
+    .fridge-cell.fresh{grid-column:1 / span 2;grid-row:3 / span 1}
+    .fridge-cell.drawers{grid-column:1 / span 2;grid-row:4 / span 1}
+    .fridge-cell.freezer{grid-column:1 / span 2;grid-row:5 / span 2}
+    .fridge-cell .label{font-weight:800}
+    .fridge-cell .count{position:absolute;right:10px;top:10px;font-size:12px;color:var(--m)}
+    .fridge-cell .mini{font-size:22px}
+    [data-theme="dark"] .fridge-cell{background:linear-gradient(180deg,#1b1f1e,#171a19);border-color:#2a2a2a}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .kpi .card{padding:10px}
+    .kpi .value{font-weight:800;font-size:16px}
+    .plan-list{display:flex;flex-direction:column;gap:8px}
+    .plan-item{background:#f7faf8;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:grab}
+    .plan-item.dragging{opacity:.5}
+    .handle{font-size:16px}
+    .plan-item .remove{margin-left:auto;border:0;background:#eee;border-radius:8px;padding:4px 8px;cursor:pointer}
+    [data-theme="dark"] .plan-item{background:#1b2421}
+    canvas{width:100%;height:120px}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}} @keyframes fadeIn{from{opacity:0}to{opacity:1}} @keyframes up{from{transform:translateY(40px)}to{transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div id="app" class="app" data-theme="light">
+      <section class="page active" data-page="home">
+        <div class="card welcome">
+          <div class="row space">
+            <div>
+              <div id="greeting" class="title">早上好☀️ 小厨师</div>
+              <div id="today" class="muted">2026-03-03</div>
+            </div>
+            <div class="pill" id="goalPill">均衡营养</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="card"><div>食材总数</div><div id="statTotal">0</div></div>
+          <div class="card"><div>⚠️临期数量</div><div id="statSoon">0</div></div>
+          <div class="card"><div>今日可做</div><div id="statCook">0</div></div>
+        </div>
+        <div class="card float">
+          <div class="sec">冰箱迷你预览</div>
+          <div id="miniFridge"></div>
+        </div>
+        <div class="card">
+          <div class="sec">今日推荐食谱</div>
+          <div id="todayRecipes"></div>
+        </div>
+        <div class="card" id="soonListCard" style="display:none;">
+          <div class="sec">临期提醒</div>
+          <div id="soonList"></div>
+        </div>
+      </section>
+
+      <section class="page" data-page="fridge">
+        <div class="row space">
+          <div class="title">冰箱库存</div>
+          <button class="btn secondary" id="clearExpiredBtn">清理过期</button>
+        </div>
+        <div class="search"><input id="searchInput" placeholder="🔍 搜索食材" /></div>
+        <div class="tabs" id="zoneTabs"></div>
+        <div class="tabs" id="categoryTabs"></div>
+        <div id="fridgeList"></div>
+      </section>
+
+      <section class="page" data-page="manage">
+        <div class="title">管理食材</div>
+        <div class="subtabs" id="manageTabs"></div>
+        <div id="manageContent"></div>
+      </section>
+
+      <section class="page" data-page="recipes">
+        <div class="title">食谱中心</div>
+        <div class="subtabs" id="recipeTabs"></div>
+        <div id="recipeContent"></div>
+      </section>
+
+      <section class="page" data-page="me">
+        <div id="meContent"></div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="tab active" data-target="home">首页</div>
+    <div class="tab" data-target="fridge">冰箱</div>
+    <div class="tab plus" data-target="manage"><button class="btn">➕</button></div>
+    <div class="tab" data-target="recipes">食谱</div>
+    <div class="tab" data-target="me">我的</div>
+  </nav>
+
+  <div id="toast" class="toast">提示</div>
+
+  <div id="recipeModal" class="modal">
+    <div class="panel">
+      <div class="row space">
+        <div id="modalTitle" class="title">🍳 食谱</div>
+        <div>
+          <button class="btn ghost" id="modalFavBtn">❤️</button>
+          <button class="btn ghost" id="modalClose">✕</button>
+        </div>
+      </div>
+      <div id="modalMeta" class="muted" style="margin:6px 0 10px;"></div>
+      <div id="modalInfo"></div>
+      <div class="sec">食材清单</div>
+      <div id="modalIngredients"></div>
+      <div class="sec">烹饪步骤</div>
+      <div id="modalSteps"></div>
+      <div id="modalMissing"></div>
+      <div class="row space" style="margin-top:12px;">
+        <button class="btn ghost" id="addShoppingBtn">加入购物清单</button>
+        <button class="btn secondary" id="markCookedBtn">✅标记已做</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal">
+    <div class="panel">
+      <div class="title">确认操作</div>
+      <div id="confirmText" class="muted" style="margin:10px 0 16px;">确定要执行吗？</div>
+      <div class="row space">
+        <button class="btn ghost" id="confirmCancel">取消</button>
+        <button class="btn secondary" id="confirmOk">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY="fridge_butler_v1";
+    const todayStr=()=>new Date().toISOString().slice(0,10);
+    const calorieHints={番茄:18,鸡蛋:155,猪肉:395,牛肉:250,鸡胸肉:133,土豆:81,西兰花:34,黄瓜:16,豆腐:81,牛奶:65,大米:346,面粉:361,胡萝卜:41,菠菜:28,青椒:27,洋葱:40,蘑菇:26,虾:93,鱼:113,苹果:52,香蕉:89,橙子:47};
+    const recipeSeeds={
+      "家常菜":[
+        {name:"番茄炒鸡蛋",emoji:"🍅"},{name:"青椒肉丝",emoji:"🫑"},{name:"麻婆豆腐",emoji:"🌶️"},{name:"蒜蓉炒西兰花",emoji:"🥦"},{name:"清炒土豆丝",emoji:"🥔"},
+        {name:"鱼香肉丝",emoji:"🐟"},{name:"清蒸鱼",emoji:"🐟"},{name:"虾仁炒蛋",emoji:"🦐"},{name:"清炒菠菜",emoji:"🥬"},{name:"清炒蘑菇",emoji:"🍄"},
+        {name:"清炒黄瓜",emoji:"🥒"},{name:"家常煎豆腐",emoji:"🍲"},{name:"清炒豆腐",emoji:"🍲"},{name:"清炒土豆胡萝卜",emoji:"🥕"},{name:"清炒蘑菇豆腐",emoji:"🍄"},
+        {name:"清炒黄瓜鸡蛋",emoji:"🥒"},{name:"清炒青椒豆腐",emoji:"🫑"},{name:"清炒胡萝卜青椒",emoji:"🥕"},{name:"清炒豆芽胡萝卜",emoji:"🌱"},{name:"红烧肉",emoji:"🥩"}
+      ],
+      "汤类":[
+        {name:"番茄蛋花汤",emoji:"🍲"},{name:"紫菜蛋花汤",emoji:"🌊"},{name:"冬瓜排骨汤",emoji:"🥒"},{name:"葱花蛋汤",emoji:"🥣"},{name:"蘑菇鸡蛋汤",emoji:"🍄"},
+        {name:"土豆炖排骨",emoji:"🍖"},{name:"玉米排骨汤",emoji:"🌽"},{name:"海带排骨汤",emoji:"🥣"},{name:"萝卜牛腩汤",emoji:"🥕"},{name:"紫菜豆腐汤",emoji:"🌊"},
+        {name:"菌菇汤",emoji:"🍄"},{name:"番茄豆腐汤",emoji:"🍲"},{name:"西红柿牛腩汤",emoji:"🍅"},{name:"三鲜汤",emoji:"🥣"},{name:"冬瓜虾仁汤",emoji:"🦐"},
+        {name:"酸辣汤",emoji:"🌶️"},{name:"青菜豆腐汤",emoji:"🥬"},{name:"丝瓜蛋汤",emoji:"🥚"},{name:"胡萝卜排骨汤",emoji:"🥕"},{name:"山药排骨汤",emoji:"🥔"}
+      ],
+      "凉菜":[
+        {name:"凉拌黄瓜",emoji:"🥒"},{name:"番茄鸡蛋沙拉",emoji:"🥗"},{name:"凉拌西兰花",emoji:"🥦"},{name:"凉拌菠菜",emoji:"🥬"},{name:"蔬菜沙拉",emoji:"🥗"},
+        {name:"凉拌木耳",emoji:"🍄"},{name:"凉拌豆腐丝",emoji:"🍲"},{name:"凉拌海带丝",emoji:"🌊"},{name:"酸甜萝卜",emoji:"🥕"},{name:"凉拌秋葵",emoji:"🥬"},
+        {name:"麻酱黄瓜",emoji:"🥒"},{name:"香拌金针菇",emoji:"🍄"},{name:"蒜蓉生菜",emoji:"🥬"},{name:"凉拌番茄",emoji:"🍅"},{name:"凉拌土豆丝",emoji:"🥔"},
+        {name:"凉拌豆芽",emoji:"🌱"},{name:"凉拌茄子",emoji:"🍆"},{name:"凉拌紫甘蓝",emoji:"🥗"},{name:"凉拌三丝",emoji:"🥕"},{name:"凉拌西红柿",emoji:"🍅"}
+      ],
+      "中式包点":[
+        {name:"小笼包",emoji:"🥟"},{name:"豆沙包",emoji:"🥠"},{name:"肉包",emoji:"🥟"},{name:"菜包",emoji:"🥟"},{name:"灌汤包",emoji:"🥟"},
+        {name:"烧麦",emoji:"🥟"},{name:"葱花卷",emoji:"🥖"},{name:"奶黄包",emoji:"🥠"},{name:"玉米馒头",emoji:"🌽"},{name:"红糖馒头",emoji:"🍞"},
+        {name:"锅贴",emoji:"🥟"},{name:"韭菜盒子",emoji:"🥟"},{name:"水煎包",emoji:"🥟"},{name:"生煎",emoji:"🥟"},{name:"虾饺",emoji:"🥟"},
+        {name:"萝卜丝包",emoji:"🥟"},{name:"芹菜包",emoji:"🥟"},{name:"豆腐包",emoji:"🥟"},{name:"紫薯包",emoji:"🍠"},{name:"枣泥包",emoji:"🥠"}
+      ],
+      "烘焙":[
+        {name:"牛奶吐司",emoji:"🍞"},{name:"全麦面包",emoji:"🥖"},{name:"香蕉面包",emoji:"🍌"},{name:"海绵蛋糕",emoji:"🍰"},{name:"巧克力蛋糕",emoji:"🍫"},
+        {name:"蛋挞",emoji:"🥧"},{name:"曲奇饼干",emoji:"🍪"},{name:"纸杯蛋糕",emoji:"🧁"},{name:"芝士蛋糕",emoji:"🧀"},{name:"英式司康",emoji:"🥐"},
+        {name:"红豆牛奶面包",emoji:"🍞"},{name:"抹茶蛋糕",emoji:"🍰"},{name:"草莓蛋糕",emoji:"🍓"},{name:"可可曲奇",emoji:"🍪"},{name:"牛角面包",emoji:"🥐"},
+        {name:"吐司布丁",emoji:"🍮"},{name:"奶香司康",emoji:"🥐"},{name:"椰蓉面包",emoji:"🥥"},{name:"南瓜面包",emoji:"🎃"},{name:"蜂蜜小面包",emoji:"🍞"}
+      ],
+      "甜品":[
+        {name:"炖蛋",emoji:"🍮"},{name:"芒果布丁",emoji:"🥭"},{name:"水果酸奶杯",emoji:"🥤"},{name:"红豆沙",emoji:"🍮"},{name:"豆花",emoji:"🍮"},
+        {name:"奶冻",emoji:"🍮"},{name:"双皮奶",emoji:"🥛"},{name:"芝麻糊",emoji:"🥣"},{name:"银耳羹",emoji:"🥣"},{name:"水果沙拉",emoji:"🍓"},
+        {name:"南瓜羹",emoji:"🎃"},{name:"椰奶布丁",emoji:"🥥"},{name:"草莓慕斯",emoji:"🍓"},{name:"巧克力慕斯",emoji:"🍫"},{name:"芋泥甜品",emoji:"🍠"},
+        {name:"奶茶布丁",emoji:"🧋"},{name:"桂花糯米藕",emoji:"🍯"},{name:"紫薯泥",emoji:"🍠"},{name:"冰粉",emoji:"🍧"},{name:"杨枝甘露",emoji:"🥭"}
+      ],
+      "饮品":[
+        {name:"燕麦牛奶",emoji:"🥛"},{name:"水果奶昔",emoji:"🍓"},{name:"柠檬水",emoji:"🍋"},{name:"蜂蜜柚子茶",emoji:"🍯"},{name:"红枣茶",emoji:"🍵"},
+        {name:"豆浆",emoji:"🥛"},{name:"酸奶昔",emoji:"🥤"},{name:"香蕉牛奶",emoji:"🍌"},{name:"草莓牛奶",emoji:"🍓"},{name:"可可牛奶",emoji:"🍫"},
+        {name:"椰奶拿铁",emoji:"🥥"},{name:"抹茶拿铁",emoji:"🍵"},{name:"红豆奶茶",emoji:"🧋"},{name:"姜茶",emoji:"🫚"},{name:"玉米汁",emoji:"🌽"},
+        {name:"苹果汁",emoji:"🍎"},{name:"橙汁",emoji:"🍊"},{name:"西瓜汁",emoji:"🍉"},{name:"蓝莓酸奶",emoji:"🫐"},{name:"芒果酸奶",emoji:"🥭"}
+      ],
+      "主食":[
+        {name:"白米饭",emoji:"🍚"},{name:"炒米饭",emoji:"🍳"},{name:"番茄鸡蛋面",emoji:"🍜"},{name:"鸡蛋三明治",emoji:"🥪"},{name:"南瓜粥",emoji:"🎃"},
+        {name:"红薯粥",emoji:"🍠"},{name:"蛋炒饭",emoji:"🍳"},{name:"牛肉面",emoji:"🍜"},{name:"鸡汤面",emoji:"🍜"},{name:"阳春面",emoji:"🍜"},
+        {name:"杂粮饭",emoji:"🍚"},{name:"鸡丝粥",emoji:"🥣"},{name:"虾仁粥",emoji:"🦐"},{name:"皮蛋瘦肉粥",emoji:"🥣"},{name:"番茄炒饭",emoji:"🍅"},
+        {name:"咖喱饭",emoji:"🍛"},{name:"蔬菜炒饭",emoji:"🥗"},{name:"盖浇饭",emoji:"🍚"},{name:"意面",emoji:"🍝"},{name:"牛肉盖饭",emoji:"🍚"}
+      ]
+    };
+    const categoryMeta={
+      "家常菜":{mealType:["午餐","晚餐"],level:"中等",cal:320,tags:["快手菜","高蛋白"],time:20},
+      "汤类":{mealType:["午餐","晚餐"],level:"低卡",cal:160,tags:["清淡"],time:25},
+      "凉菜":{mealType:["午餐","晚餐"],level:"低卡",cal:120,tags:["减脂友好"],time:10},
+      "中式包点":{mealType:["早餐"],level:"中等",cal:260,tags:["饱腹"],time:45},
+      "烘焙":{mealType:["下午茶","早餐"],level:"中等",cal:260,tags:["甜品"],time:50},
+      "甜品":{mealType:["下午茶"],level:"中等",cal:220,tags:["甜品"],time:20},
+      "饮品":{mealType:["下午茶","早餐"],level:"低卡",cal:180,tags:["清爽"],time:5},
+      "主食":{mealType:["早餐","午餐","晚餐"],level:"中等",cal:320,tags:["基础主食"],time:25}
+    };
+    function buildRecipe(cat,it,idx){
+      const meta=categoryMeta[cat];
+      const diff=meta.level==="低卡"?"简单":meta.level==="高热量"?"偏难":"中等";
+      const ingredientsPool={
+        "家常菜":["鸡蛋","番茄","黄瓜","西兰花","土豆","猪肉","豆腐","青椒"],
+        "汤类":["番茄","鸡蛋","排骨","冬瓜","紫菜","蘑菇","豆腐"],
+        "凉菜":["黄瓜","番茄","菠菜","生菜","木耳","豆芽"],
+        "中式包点":["面粉","猪肉","豆沙","蔬菜","酵母"],
+        "烘焙":["面粉","鸡蛋","牛奶","黄油","糖"],
+        "甜品":["牛奶","鸡蛋","水果","糖","吉利丁"],
+        "饮品":["牛奶","水果","蜂蜜","燕麦","酸奶"],
+        "主食":["大米","面条","鸡蛋","蔬菜","肉类"]
+      }[cat] || ["食材A","食材B","食材C"];
+      const pick=(arr)=>arr[Math.floor(Math.random()*arr.length)];
+      const ing=[{name:pick(ingredientsPool),amount:1,unit:"份"},{name:pick(ingredientsPool),amount:1,unit:"份"},{name:pick(ingredientsPool),amount:1,unit:"份"}];
+      return {
+        name:it.name,emoji:it.emoji,category:cat,mealType:meta.mealType,difficulty:diff,time:meta.time+(idx%3)*5,servings:2,
+        totalCalories:meta.cal+(idx%5)*20,caloriesLevel:meta.level,healthTags:meta.tags,
+        ingredients:ing,
+        steps:["准备食材，清洗切配备用。","按顺序下锅/搅拌处理主料。","加入调味并继续处理至熟。","装盘即可，注意口感与火候。"]
+      };
+    }
+    const recipesDB=Object.entries(recipeSeeds).flatMap(([cat,items])=>items.map((it,idx)=>buildRecipe(cat,it,idx)));
+
+    const defaultData={user:{name:"小厨师",goal:"均衡营养",avatar:"👩‍🍳",remindDays:3,darkMode:false,people:1,showSnack:true,fridgeLayout:"单门冰箱"},fridge:[
+      {id:1,name:"番茄",emoji:"🍅",qty:3,unit:"个",category:"蔬菜",zone:"冷藏",expire:addDays(7),calories:18,note:""},
+      {id:2,name:"鸡蛋",emoji:"🥚",qty:6,unit:"个",category:"蛋奶",zone:"冷藏",expire:addDays(14),calories:155,note:""},
+      {id:3,name:"土豆",emoji:"🥔",qty:2,unit:"个",category:"蔬菜",zone:"蔬果格",expire:addDays(10),calories:81,note:""},
+      {id:4,name:"猪肉",emoji:"🥩",qty:300,unit:"克",category:"肉类",zone:"冷藏",expire:addDays(2),calories:395,note:"临期"},
+      {id:5,name:"豆腐",emoji:"🧈",qty:1,unit:"盒",category:"蛋奶",zone:"冷藏",expire:addDays(3),calories:81,note:"临期"},
+      {id:6,name:"葱",emoji:"🧅",qty:1,unit:"把",category:"蔬菜",zone:"蔬果格",expire:addDays(5),calories:27,note:""},
+      {id:7,name:"大蒜",emoji:"🧄",qty:1,unit:"头",category:"调料",zone:"门架",expire:addDays(30),calories:0,note:""},
+      {id:8,name:"西兰花",emoji:"🥦",qty:1,unit:"棵",category:"蔬菜",zone:"蔬果格",expire:addDays(4),calories:34,note:""},
+      {id:9,name:"黄瓜",emoji:"🥒",qty:2,unit:"根",category:"蔬菜",zone:"蔬果格",expire:addDays(6),calories:16,note:""},
+      {id:10,name:"生抽",emoji:"🍶",qty:1,unit:"瓶",category:"调料",zone:"门架",expire:addDays(180),calories:0,note:""},
+      {id:11,name:"苹果",emoji:"🍎",qty:3,unit:"个",category:"其他",zone:"蔬果格",expire:addDays(7),calories:52,note:""},
+      {id:12,name:"香蕉",emoji:"🍌",qty:4,unit:"根",category:"其他",zone:"蔬果格",expire:addDays(5),calories:89,note:""},
+      {id:13,name:"橙子",emoji:"🍊",qty:3,unit:"个",category:"其他",zone:"蔬果格",expire:addDays(8),calories:47,note:""}
+    ],favorites:[],cookedLog:[],weeklyPlan:{},todayPlan:{},shopping:{today:[],week:[]},dataLog:genDataLog()};
+
+    function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+    function genDataLog(){const t=new Date();const res=[];for(let i=6;i>=0;i--){const d=new Date(t);d.setDate(d.getDate()-i);res.push({date:d.toISOString().slice(0,10),added:Math.floor(Math.random()*4)+1,wasted:Math.floor(Math.random()*2),cooked:Math.floor(Math.random()*3),calories:1300+Math.floor(Math.random()*700)})}return res}
+    function loadState(){const raw=localStorage.getItem(STORAGE_KEY);if(!raw) return structuredClone(defaultData);try{return JSON.parse(raw)}catch{return structuredClone(defaultData)}}
+    function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+    let state=loadState();
+    if(!state.todayPlan) state.todayPlan={};
+    if(!state.shopping) state.shopping={today:[],week:[]};
+    if(!state.user.people) state.user.people=1;
+    if(state.user.showSnack===undefined) state.user.showSnack=true;
+    if(!state.user.fridgeLayout) state.user.fridgeLayout="单门冰箱";
+
+    const $=(s,e=document)=>e.querySelector(s); const $$=(s,e=document)=>Array.from(e.querySelectorAll(s));
+    function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2000)}
+    function confirmBox(text,onOk){$("#confirmText").textContent=text;const m=$("#confirmModal");m.classList.add("active");
+      const ok=()=>{m.classList.remove("active");onOk?.();clean()};const cancel=()=>{m.classList.remove("active");clean()};
+      const clean=()=>{$("#confirmOk").removeEventListener("click",ok);$("#confirmCancel").removeEventListener("click",cancel)};
+      $("#confirmOk").addEventListener("click",ok);$("#confirmCancel").addEventListener("click",cancel)}
+    const daysLeft=exp=>Math.ceil((new Date(exp)-new Date())/(1000*3600*24));
+    const statusTag=item=>{const l=daysLeft(item.expire);if(l<0)return{text:"❌已过期",cls:"bad"};if(l<=state.user.remindDays)return{text:`⚠️还剩${l}天`,cls:"warn"};return{text:"✅新鲜",cls:"ok"}};
+    function score(recipe,meal=""){const names=state.fridge.map(f=>f.name);const matched=recipe.ingredients.filter(i=>names.includes(i.name)).length;const match=matched/recipe.ingredients.length;
+      let health=.5;if(state.user.goal.includes("减脂"))health=recipe.caloriesLevel==="低卡"?1:recipe.caloriesLevel==="中等"?.6:.2;
+      if(state.user.goal.includes("增肌"))health=recipe.healthTags.includes("高蛋白")?1:.4;
+      if(state.user.goal.includes("均衡"))health=recipe.caloriesLevel==="中等"?1:.6;
+      const soon=state.fridge.filter(f=>daysLeft(f.expire)<=state.user.remindDays).map(f=>f.name);
+      const soonBoost=recipe.ingredients.some(i=>soon.includes(i.name))?.3:0;const timeFit=meal && recipe.mealType.includes(meal)?1:.5;
+      return match*.4+health*.3+soonBoost*.2+timeFit*.1}
+
+    function renderHome(){
+      const now=new Date();const h=now.getHours();const g=h<12?"早上好☀️":h<18?"下午好🌤️":"晚上好🌙";
+      $("#greeting").textContent=`${g} ${state.user.name}`;$("#today").textContent=now.toLocaleDateString("zh-CN",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+      $("#goalPill").textContent=state.user.goal;
+      $("#statTotal").textContent=state.fridge.length;
+      $("#statSoon").textContent=state.fridge.filter(f=>daysLeft(f.expire)<=state.user.remindDays&&daysLeft(f.expire)>=0).length;
+      $("#statCook").textContent=getToday().length;
+      const zones=["冷藏","冷冻","蔬果格"];
+      $("#miniFridge").innerHTML=zones.map(z=>{
+        const items=state.fridge.filter(f=>f.zone===z);const soon=items.filter(f=>daysLeft(f.expire)<=state.user.remindDays&&daysLeft(f.expire)>=0).length;const pct=Math.min(100,items.length*20);
+        return `<div class="row space" style="margin:8px 0;cursor:pointer" data-zone="${z}">
+          <div>${z==="冷藏"?"❄️冷藏区":z==="冷冻"?"🧊冷冻区":"🥗蔬果格"}</div>
+          <div style="flex:1;margin:0 8px"><div class="progress"><span style="width:${pct}%"></span></div></div>
+          <div>${items.length} | ${soon>0?`⚠️${soon}`:"✅"}</div>
+        </div>`}).join("");
+      $$("#miniFridge [data-zone]").forEach(el=>el.onclick=()=>{go("fridge");activeZone=el.dataset.zone;renderFridge()});
+      const group=getTodayGroup();
+      const showSnack = state.user.showSnack;
+      const homeMeals=["早餐","午餐","晚餐"].concat(state.user.showSnack?["下午茶"]:[]);
+      $("#todayRecipes").innerHTML=homeMeals.map(t=>`<div class="sec">${t==="早餐"?"早餐☀️":t==="午餐"?"午餐🍱":t==="晚餐"?"晚餐🌙":"下午茶🍪"}
+        ${t==="下午茶"?`<span style="float:right;font-size:12px;cursor:pointer" id="hideSnack">隐藏</span>`:""}
+      </div>
+        <div class="scroll">${group[t].map(r=>recipeCard(r)).join("")}</div>`).join("");
+      bindRecipeCards();
+      $("#hideSnack")?.addEventListener("click",()=>{state.user.showSnack=false;saveState();renderHome();});
+      const soonList=state.fridge.filter(f=>daysLeft(f.expire)<=state.user.remindDays&&daysLeft(f.expire)>=0);
+      if(!soonList.length){$("#soonListCard").style.display="none"}else{
+        $("#soonListCard").style.display="block";
+        $("#soonList").innerHTML=soonList.map(f=>{
+          const r=recipesDB.find(x=>x.ingredients.some(i=>i.name===f.name));
+          return `<div class="row space" style="margin:6px 0">
+            <div>⚠️ ${f.emoji||"🍽️"} ${f.name}</div>
+            <div class="tag warn">还剩${daysLeft(f.expire)}天</div>
+            <div class="muted">${r?`推荐：${r.name}`:""}</div>
+          </div>`}).join("");
+      }
+    }
+    const getTop=(meal,n,exclude=new Set())=>recipesDB.filter(r=>r.mealType.includes(meal)&&!exclude.has(r.name))
+      .map(r=>({r,s:score(r,meal)})).sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.r);
+    const getToday=()=>["早餐","午餐","晚餐"].flatMap(m=>getTop(m,2));
+    const getTodayGroup=()=>{
+      const lunch=getTop("午餐",3);
+      const used=new Set(lunch.map(x=>x.name));
+      const dinner=getTop("晚餐",3,used);
+      const breakfast=getTop("早餐",2);
+      const snack=state.user.showSnack?getTop("下午茶",2):[];
+      return {早餐:breakfast,午餐:lunch,晚餐:dinner,下午茶:snack};
+    };
+    const recipeCard=r=>{const m=score(r);const label=m>0.8?"完全匹配":m>0.6?"较匹配":"差1~2种";const c=m>0.8?"ok":"warn";
+      return `<div class="recipe" data-recipe="${r.name}"><div class="emoji">${r.emoji}</div><div style="font-weight:800">${r.name}</div><div class="tag ${c}">${label}</div></div>`}
+    const bindRecipeCards=()=>{$$(".recipe").forEach(el=>el.onclick=()=>openRecipe(el.dataset.recipe))};
+
+    const zones=["全部","冷藏","冷冻","蔬果格","门架"];const categories=["全部","肉类","蔬菜","海鲜","蛋奶","调料","饮料","其他"];
+    let activeZone="全部",activeCategory="全部";
+    function renderFridge(){
+      $("#zoneTabs").innerHTML=zones.map(z=>`<div class="tab-pill ${z===activeZone?"active":""}" data-zone="${z}">${z==="冷藏"?"❄️冷藏区":z==="冷冻"?"🧊冷冻区":z==="蔬果格"?"🥗蔬果格":z}</div>`).join("");
+      $("#categoryTabs").innerHTML=categories.map(c=>`<div class="tab-pill ${c===activeCategory?"active":""}" data-cat="${c}">${c}</div>`).join("");
+      $$("#zoneTabs .tab-pill").forEach(el=>el.onclick=()=>{activeZone=el.dataset.zone;renderFridge()});
+      $$("#categoryTabs .tab-pill").forEach(el=>el.onclick=()=>{activeCategory=el.dataset.cat;renderFridge()});
+      const q=$("#searchInput").value.trim();let list=state.fridge;
+      if(activeZone!=="全部") list=list.filter(f=>f.zone===activeZone);
+      if(activeCategory!=="全部") list=list.filter(f=>f.category===activeCategory);
+      if(q) list=list.filter(f=>f.name.includes(q));
+      if(!list.length){$("#fridgeList").innerHTML=`<div class="empty"><div class="emoji">🧊</div><div>冰箱空空的</div><button class="btn" id="goAddBtn">去添加</button></div>`;$("#goAddBtn")?.addEventListener("click",()=>go("manage"));return}
+      $("#fridgeList").innerHTML=`<div class="grid2">${list.map(f=>{const st=statusTag(f);return `<div class="food" data-food="${f.id}">
+        <div class="acts"><button class="icon" data-edit="${f.id}">✏️</button><button class="icon" data-del="${f.id}">❌</button></div>
+        <div class="emoji">${f.emoji||"🍽️"}</div><div class="name">${f.name}</div>
+        <div class="tag ${st.cls}">${st.text}</div>
+      </div>`}).join("")}</div>`;
+      $$("#fridgeList [data-edit]").forEach(el=>el.onclick=()=>{editId=Number(el.dataset.edit);manageTab="✏️手动录入";go("manage")});
+      $$("#fridgeList [data-del]").forEach(el=>el.onclick=()=>confirmBox("确定删除该食材吗？",()=>{const id=Number(el.dataset.del);state.fridge=state.fridge.filter(f=>f.id!==id);saveState();renderAll();toast("已删除")}));
+      $$("#fridgeList [data-food]").forEach(el=>el.addEventListener("click",(e)=>{if(e.target.closest(".acts"))return;openFoodModal(Number(el.dataset.food));}));
+    }
+    $("#searchInput").addEventListener("input",renderFridge);
+    $("#clearExpiredBtn").addEventListener("click",()=>{const expired=state.fridge.filter(f=>daysLeft(f.expire)<0);if(!expired.length)return toast("没有已过期食材");
+      confirmBox("确定清理所有已过期食材？",()=>{state.fridge=state.fridge.filter(f=>daysLeft(f.expire)>=0);saveState();renderAll();toast("已清理过期食材")})});
+
+    let manageTab="✏️手动录入",editId=null;const manageTabs=["✏️手动录入","拍照识别","小票扫描"];
+    function renderManage(){
+      $("#manageTabs").innerHTML=manageTabs.map(t=>`<div class="sub ${t===manageTab?"active":""}" data-tab="${t}">${t}</div>`).join("");
+      $$("#manageTabs .sub").forEach(el=>el.onclick=()=>{manageTab=el.dataset.tab;renderManage()});
+      if(manageTab.includes("手动")) renderForm();
+      if(manageTab.includes("拍照")) renderPhoto();
+      if(manageTab.includes("小票")) renderReceipt();
+    }
+    function renderForm(){
+      const item=state.fridge.find(f=>f.id===editId);
+      $("#manageContent").innerHTML=`<div class="card"><div class="form">
+        <div class="full"><label>食材名称*</label><input id="fName" value="${item?.name||""}" placeholder="如：番茄" /></div>
+        <div><label>存放区域*</label><select id="fZone">${["冷藏","冷冻","蔬果格","门架"].map(z=>`<option ${item?.zone===z?"selected":""}>${z}</option>`).join("")}</select></div>
+        <div><label>食材分类*</label><select id="fCat">${["肉类","蔬菜","海鲜","蛋奶","调料","饮料","其他"].map(c=>`<option ${item?.category===c?"selected":""}>${c}</option>`).join("")}</select></div>
+        <div><label>数量*</label><input id="fQty" type="number" value="${item?.qty||1}" /></div>
+        <div><label>单位*</label><input id="fUnit" value="${item?.unit||"个"}" placeholder="个/克/瓶" /></div>
+        <div class="full"><label>过期日期*</label><input id="fExpire" type="date" value="${item?.expire||addDays(7)}" /></div>
+        <div class="full"><label>高级选项</label>
+          <div class="row space">
+            <button class="btn ghost" id="toggleAdvanced">展开热量/备注</button>
+            <div class="muted">可选</div>
+          </div>
+        </div>
+        <div id="advancedBox" class="full" style="display:none;">
+          <label>热量参考 (kcal/100g)</label><input id="fCal" type="number" value="${item?.calories||""}" placeholder="自动提示" />
+          <label style="margin-top:8px;">备注</label><textarea id="fNote" rows="2">${item?.note||""}</textarea>
+        </div>
+      </div>
+      <div class="row space" style="margin-top:12px;"><button class="btn ghost" id="cancelEdit">取消</button><button class="btn secondary" id="saveFood">✅确认保存</button></div></div>`;
+      $("#fName").addEventListener("input",e=>{const n=e.target.value.trim();if(calorieHints[n])$("#fCal").value=calorieHints[n]});
+      $("#toggleAdvanced").onclick=()=>{const box=$("#advancedBox");box.style.display=box.style.display==="none"?"block":"none"};
+      $("#cancelEdit").onclick=()=>{editId=null;renderManage()}; $("#saveFood").onclick=saveFood;
+    }
+    function saveFood(){
+      const name=$("#fName").value.trim(),zone=$("#fZone").value,category=$("#fCat").value,qty=Number($("#fQty").value),unit=$("#fUnit").value.trim(),expire=$("#fExpire").value,calories=Number($("#fCal").value||0),note=$("#fNote").value.trim();
+      if(!name||!zone||!category||!qty||!unit||!expire) return toast("请完善必填项");
+      const emoji=guessEmoji(name);
+      if(editId){const i=state.fridge.findIndex(f=>f.id===editId);state.fridge[i]={...state.fridge[i],name,zone,category,qty,unit,expire,calories,note,emoji};toast("已更新食材")}
+      else{state.fridge.push({id:Date.now(),name,zone,category,qty,unit,expire,calories,note,emoji});toast("已添加食材")}
+      editId=null;saveState();renderAll();
+    }
+    function renderPhoto(){
+      $("#manageContent").innerHTML=`<div class="card"><div class="upload"><div style="font-size:36px;">📷</div><div>拍照识别（模拟）</div><input id="photoInput" type="file" accept="image/*" />
+        <div class="row space" style="margin-top:10px;"><button class="btn secondary" id="quickPhoto">选择图片并识别</button></div>
+        <img id="photoPreview" class="preview" style="display:none" /><div id="photoResult"></div></div></div>`;
+      $("#photoInput").addEventListener("change",handlePhoto); $("#quickPhoto").onclick=()=>$("#photoInput").click();
+    }
+    function handlePhoto(e){
+      const file=e.target.files[0];if(!file) return;const url=URL.createObjectURL(file);$("#photoPreview").src=url;$("#photoPreview").style.display="block";
+      $("#photoResult").innerHTML=`<div class="muted" style="margin:8px 0;">识别中...</div>`;
+      setTimeout(()=>{const picks=shuffle(["番茄","鸡蛋","土豆","黄瓜","西兰花","豆腐","牛奶","虾","鱼","胡萝卜"]).slice(0,6);
+        $("#photoResult").innerHTML=`<div class="sec">识别结果</div>${picks.map(p=>`<label style="display:block;margin:4px 0;"><input type="checkbox" value="${p}" checked /> ${p}</label>`).join("")}
+        <button class="btn secondary" id="addFromPhoto">添加选中食材</button>`;
+        $("#addFromPhoto").onclick=()=>{manageTab="✏️手动录入";renderManage();toast("已将选中食材预填到表单")};
+      },1500);
+    }
+    function renderReceipt(){
+      $("#manageContent").innerHTML=`<div class="card"><div class="upload"><div style="font-size:36px;">🧾</div><div>小票扫描（模拟）</div><input id="receiptInput" type="file" accept="image/*" />
+        <div class="row space" style="margin-top:10px;"><button class="btn secondary" id="quickReceipt">选择图片并识别</button></div>
+        <img id="receiptPreview" class="preview" style="display:none" /><div id="receiptResult"></div></div></div>`;
+      $("#receiptInput").addEventListener("change",handleReceipt); $("#quickReceipt").onclick=()=>$("#receiptInput").click();
+    }
+    function handleReceipt(e){
+      const file=e.target.files[0];if(!file) return;const url=URL.createObjectURL(file);$("#receiptPreview").src=url;$("#receiptPreview").style.display="block";
+      $("#receiptResult").innerHTML=`<div class="muted" style="margin:8px 0;">识别中...</div>`;
+      setTimeout(()=>{const items=shuffle(["番茄","鸡蛋","土豆","黄瓜","西兰花","豆腐","牛奶","虾"]).slice(0,5);
+        $("#receiptResult").innerHTML=`<div class="sec">识别结果</div>${items.map(p=>`<label style="display:block;margin:4px 0;"><input type="checkbox" value="${p}" checked /> ${p}
+          <input type="number" value="1" style="width:60px;margin-left:8px;" /> 个</label>`).join("")}
+          <div class="row space"><button class="btn ghost" id="allReceipt">全选</button><button class="btn ghost" id="noneReceipt">取消全选</button></div>
+          <button class="btn secondary" id="addReceipt">批量添加已选</button>`;
+        $("#allReceipt").onclick=()=>$$(`#receiptResult input[type=checkbox]`).forEach(c=>c.checked=true);
+        $("#noneReceipt").onclick=()=>$$(`#receiptResult input[type=checkbox]`).forEach(c=>c.checked=false);
+        $("#addReceipt").onclick=()=>{manageTab="✏️手动录入";renderManage();toast("已批量添加到手动表单")};
+      },2000);
+    }
+    let recipeTab="☀️今日食谱";
+    function renderRecipes(){
+      $("#recipeTabs").innerHTML=["☀️今日食谱","每周规划","食谱库","购物清单"].map(t=>`<div class="sub ${t===recipeTab?"active":""}" data-tab="${t}">${t}</div>`).join("");
+      $$("#recipeTabs .sub").forEach(el=>el.onclick=()=>{recipeTab=el.dataset.tab;renderRecipes()});
+      if(recipeTab.includes("今日")) renderToday();
+      if(recipeTab.includes("每周")) renderWeek();
+      if(recipeTab.includes("库")) renderLibrary();
+      if(recipeTab.includes("购物")) renderShoppingTab();
+    }
+    function renderToday(){
+      const group=getTodayGroup();
+      const plan=state.todayPlan||{};
+      const meals=["早餐","午餐","晚餐"].concat(showSnack?["下午茶"]:[]);
+      const planHtml=meals.map(m=>{
+        const list=plan[m]||[];
+        const items=list.map(r=>`<div class="plan-item" draggable="true" data-meal="${m}" data-name="${r.name}">
+            <span class="handle">☰</span><span>${r.emoji} ${r.name}</span>
+            <button class="remove" data-remove="${r.name}" data-meal="${m}">删除</button>
+          </div>`).join("");
+        return `<div class="module">
+          <div class="row space"><div>${m}</div><div class="tag ${list.length?"ok":"warn"}">${list.length?`已安排${list.length}道`:"未安排"}</div></div>
+          <div class="plan-list" data-meal="${m}">${items||"<div class='muted'>点击添加</div>"}</div>
+          <div class="row space" style="margin-top:8px;">
+            <button class="btn ghost" data-add="${m}">添加菜品</button>
+            <button class="btn ghost" data-clear="${m}">清空</button>
+          </div>
+        </div>`;
+      }).join("");
+      $("#recipeContent").innerHTML=`<div class="card muted">基于冰箱食材 + 健康目标 + 营养均衡</div>
+        <div class="card">
+          <div class="sec">今日菜单计划</div>
+          <div class="muted">人数：${state.user.people} 人 · 规则：一人一饭一荤一素一汤</div>
+          ${planHtml}
+          <div class="row space" style="margin-top:10px;">
+            <button class="btn secondary" id="genTodayPlan">一键生成今日菜单</button>
+            <button class="btn ghost" id="genTodayShop">生成今日购物清单</button>
+          </div>
+          <div class="row space" style="margin-top:8px;">
+            <button class="btn ghost" id="openShopTab">打开购物清单页</button>
+            <button class="btn ghost" id="clearTodayPlan">清空今日菜单</button>
+          </div>
+        </div>
+        ${["早餐","午餐","晚餐"].concat(showSnack?["下午茶"]:[]).map(m=>`<div class="sec">${m}${m==="下午茶"?` <span id="toggleSnack" style="font-size:12px;cursor:pointer">隐藏</span>`:""}</div><div class="list">${group[m].map(r=>`<div class="line" data-recipe="${r.name}">
+          <div style="font-size:22px;">${r.emoji}</div><div style="flex:1"><div style="font-weight:800">${r.name}</div></div>
+          <div class="tag ${score(r)>0.8?"ok":"warn"}">${score(r)>0.8?"完全匹配":"较匹配"}</div></div>`).join("")}</div>`).join("")}
+        <div class="card"><div class="sec">今日热量</div><canvas id="calorieRing" width="300" height="120"></canvas></div>`;
+      $$(".line").forEach(el=>el.onclick=()=>openRecipe(el.dataset.recipe));
+      $("#genTodayPlan").onclick=generateTodayPlan;
+      $("#genTodayShop").onclick=generateTodayShopping;
+      $("#openShopTab").onclick=()=>{recipeTab="购物清单";renderRecipes();};
+      $("#clearTodayPlan").onclick=()=>{state.todayPlan={早餐:[],午餐:[],晚餐:[],下午茶:[]};saveState();renderToday();};
+      $("#toggleSnack")?.addEventListener("click",()=>{state.user.showSnack=false;saveState();renderToday();});
+      $$("[data-add]").forEach(el=>el.onclick=()=>openRecipePicker(el.dataset.add));
+      $$("[data-clear]").forEach(el=>el.onclick=()=>{state.todayPlan[el.dataset.clear]=[];saveState();renderToday()});
+      $$("[data-remove]").forEach(el=>el.onclick=()=>{const meal=el.dataset.meal;state.todayPlan[meal]=state.todayPlan[meal].filter(r=>r.name!==el.dataset.remove);saveState();renderToday()});
+      bindPlanDrag();
+      drawRing();
+    }
+    function drawRing(){
+      const canvas=$("#calorieRing");if(!canvas) return;const ctx=canvas.getContext("2d");
+      const goal=state.user.goal.includes("减脂")?1500:state.user.goal.includes("增肌")?2200:1800;
+      const planned=getToday().reduce((s,r)=>s+r.totalCalories,0);const ratio=Math.min(1,planned/goal);
+      const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2,r=40;
+      ctx.clearRect(0,0,w,h);ctx.lineWidth=12;ctx.strokeStyle="#eee";ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle="rgba(76,175,130,.9)";ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*ratio);ctx.stroke();
+      ctx.fillStyle=getComputedStyle(document.body).color;ctx.font="14px Nunito";ctx.textAlign="center";ctx.fillText(`${planned} / ${goal} kcal`,cx,cy+5);
+    }
+    function mealDishCount(){
+      const p=Math.max(1,Number(state.user.people)||1);
+      if(p===1) return 3; // 荤素汤，主食固定
+      if(p<=3) return 4;
+      if(p<=5) return 5;
+      return 6;
+    }
+    function generateTodayPlan(){
+      const b=[getTop("早餐",1)[0]].filter(Boolean);
+      const count=mealDishCount();
+      const pickList=(meal)=>{
+        const pool=recipesDB.filter(r=>r.mealType.includes(meal));
+        const used=new Set();
+        const meat=pool.filter(r=>r.ingredients.some(i=>["猪肉","牛肉","鸡胸肉","鱼","虾"].includes(i.name)));
+        const veg=pool.filter(r=>r.ingredients.some(i=>["番茄","黄瓜","西兰花","土豆","菠菜","胡萝卜"].includes(i.name)));
+        const soup=pool.filter(r=>r.category==="汤类");
+        const staple=pool.filter(r=>r.category==="主食"||r.name.includes("米饭")||r.name.includes("面"));
+        const pick=(arr)=>{const c=arr[Math.floor(Math.random()*arr.length)];if(c) used.add(c.name);return c};
+        const res=[pick(staple),pick(meat),pick(veg),pick(soup)].filter(Boolean);
+        while(res.length<count){const r=pool[Math.floor(Math.random()*pool.length)];if(r && !used.has(r.name)){used.add(r.name);res.push(r)}}
+        return res;
+      };
+      const l=pickList("午餐");
+      const d=pickList("晚餐");
+      const snack=state.user.showSnack?getTop("下午茶",1):[];
+      state.todayPlan={早餐:b,午餐:l,晚餐:d,下午茶:snack};
+      saveState();
+      renderToday();
+      toast("已生成今日菜单");
+    }
+    function openRecipePicker(meal){
+      const list=recipesDB.filter(r=>r.mealType.includes(meal));
+      openModal(`<div class="sec">选择${meal}食谱</div>
+        <div class="module">${list.map(r=>`<div class="line" data-pick="${r.name}">
+          <div style="font-size:22px;">${r.emoji}</div>
+          <div style="flex:1"><div style="font-weight:800">${r.name}</div></div>
+          <div class="tag ${score(r)>0.8?"ok":"warn"}">${score(r)>0.8?"完全匹配":"较匹配"}</div>
+        </div>`).join("")}</div>`);
+      $$(".modal.active [data-pick]").forEach(el=>el.onclick=()=>{
+        const r=recipesDB.find(x=>x.name===el.dataset.pick);
+        if(!state.todayPlan[meal]) state.todayPlan[meal]=[];
+        state.todayPlan[meal].push(r);
+        saveState();
+        $("#recipeModal").classList.remove("active");
+        renderToday();
+        toast("已更新今日菜单");
+      });
+    }
+    function generateTodayShopping(){
+      if(!state.todayPlan || !state.todayPlan.早餐 && !state.todayPlan.午餐 && !state.todayPlan.晚餐){
+        generateTodayPlan();
+      }
+      const selected=Object.values(state.todayPlan||{}).flat().filter(Boolean);
+      const need={};
+      selected.forEach(r=>r.ingredients.forEach(i=>need[i.name]=(need[i.name]||0)+1));
+      const haveNames=state.fridge.map(f=>f.name);
+      const needList=Object.keys(need).filter(n=>!haveNames.includes(n)).map(n=>({name:n,qty:need[n],unit:"份",price:(need[n]*5).toFixed(0),checked:true}));
+      const haveList=Object.keys(need).filter(n=>haveNames.includes(n));
+      state.shopping.today=needList;
+      saveState();
+      openModal(`<div class="sec">今日购物清单</div>
+        <div class="module"><div class="sec">需要购买</div>
+          ${needList.length?needList.map(i=>`<label style="display:block;margin:6px 0;"><input type="checkbox" data-check="${i.name}" ${i.checked?"checked":""}/> ${i.name} ${i.qty}${i.unit} ¥${i.price}</label>`).join(""):"<div class='muted'>无需购买，食材齐全</div>"}
+        </div>
+        <div class="module"><div class="sec">已有食材</div>
+          ${haveList.length?haveList.map(n=>`<div class="muted" style="margin:4px 0;">✅ ${n}</div>`).join(""):"<div class='muted'>暂无</div>"}
+        </div>
+        <div class="row space">
+          <button class="btn ghost" id="todayShopAll">全选</button>
+          <button class="btn secondary" id="todayShopShare">分享清单</button>
+        </div>`);
+      $("#todayShopAll")?.addEventListener("click",()=>$$(".modal.active input[type=checkbox]").forEach(c=>c.checked=true));
+      $$(".modal.active input[data-check]").forEach(el=>el.addEventListener("change",()=>{
+        const name=el.dataset.check;
+        const item=state.shopping.today.find(x=>x.name===name);if(item){item.checked=el.checked;saveState();}
+      }));
+      $("#todayShopShare")?.addEventListener("click",()=>{
+        const text=needList.filter(i=>i.checked).map(i=>`${i.name} ${i.qty}${i.unit}`).join("\n");
+        navigator.clipboard?.writeText(text);
+        toast("清单已复制");
+      });
+    }
+    function renderWeek(){
+      const days=["一","二","三","四","五","六","日"],meals=["早","中","晚"]; if(!state.weeklyPlan) state.weeklyPlan={};
+      $("#recipeContent").innerHTML=`<div class="week">${days.map(d=>`<div class="muted" style="text-align:center">周${d}</div>`).join("")}
+        ${meals.map(m=>days.map(d=>{const key=`周${d}${m}`;const v=state.weeklyPlan[key];return `<div class="cell" data-slot="${key}">${v?`${v.emoji} ${v.name.slice(0,4)}`:"+"}</div>`}).join("")).join("")}</div>
+        <div class="row space" style="margin:12px 0;"><button class="btn secondary" id="autoWeek">AI一键生成本周菜单</button><button class="btn ghost" id="shoppingList">生成本周购物清单</button></div>
+        <div class="row space" style="margin-bottom:8px;"><button class="btn ghost" id="openShopTabWeek">打开购物清单页</button><button class="btn ghost" id="clearWeekPlan">清空本周</button></div>
+        <div id="weeklyCalories" class="muted"></div>`;
+      $$(".cell").forEach(el=>el.onclick=()=>{state.weeklyPlan[el.dataset.slot]=recipesDB[Math.floor(Math.random()*recipesDB.length)];saveState();renderWeek()});
+      $("#autoWeek").onclick=autoWeek;$("#shoppingList").onclick=shoppingList;renderWeekCalories();
+      $("#openShopTabWeek").onclick=()=>{recipeTab="购物清单";renderRecipes();};
+      $("#clearWeekPlan").onclick=()=>{state.weeklyPlan={};saveState();renderWeek();};
+    }
+    function autoWeek(){
+      const days=["一","二","三","四","五","六","日"];const used=new Set();
+      for(const d of days){
+        const b=recipesDB.filter(r=>r.mealType.includes("早餐"));state.weeklyPlan[`周${d}早`]=pickUnique(b,used);
+        const l=recipesDB.filter(r=>r.mealType.includes("午餐"));state.weeklyPlan[`周${d}中`]=pickUnique(l,used);
+        const dn=recipesDB.filter(r=>r.mealType.includes("晚餐"));state.weeklyPlan[`周${d}晚`]=pickUnique(dn,used);
+      }
+      saveState();renderWeek();toast("本周菜单已生成");
+    }
+    function pickUnique(list,used){let c;for(let i=0;i<list.length;i++){const r=list[Math.floor(Math.random()*list.length)];if(!used.has(r.name)){c=r;used.add(r.name);break}}return c||list[0]}
+    function renderWeekCalories(){const days=["一","二","三","四","五","六","日"];
+      $("#weeklyCalories").innerHTML=days.map(d=>{const total=["早","中","晚"].reduce((s,m)=>s+(state.weeklyPlan[`周${d}${m}`]?.totalCalories||0),0);return `周${d}：${total}kcal`}).join(" · ")}
+    function shoppingList(){
+      const all=Object.values(state.weeklyPlan||{}),need={};all.forEach(r=>{if(!r) return;r.ingredients.forEach(i=>need[i.name]=(need[i.name]||0)+1)});
+      const have=state.fridge.map(f=>f.name);
+      const list=Object.keys(need).filter(n=>!have.includes(n)).map(n=>({name:n,qty:need[n],unit:"份",price:(need[n]*5).toFixed(0),checked:true}));
+      state.shopping.week=list;
+      saveState();
+      openModal(`<div class="sec">本周还需采购</div>${list.map(i=>`<label style="display:block;margin:6px 0;"><input type="checkbox" data-check="${i.name}" ${i.checked?"checked":""}/> ${i.name} ${i.qty}${i.unit} ¥${i.price}</label>`).join("")}
+        <div class="row space"><button class="btn ghost" id="shoppingAll">全选</button><button class="btn ghost" id="shoppingAdd">手动添加一项</button><button class="btn secondary" id="shoppingShare">分享清单</button></div>`);
+      $("#shoppingAll").onclick=()=>$$(".modal.active input[type=checkbox]").forEach(c=>c.checked=true);
+      $$(".modal.active input[data-check]").forEach(el=>el.addEventListener("change",()=>{
+        const name=el.dataset.check;const item=state.shopping.week.find(x=>x.name===name);if(item){item.checked=el.checked;saveState();}
+      }));
+      $("#shoppingAdd").onclick=()=>{const name=prompt("食材名");if(name){state.shopping.week.push({name,qty:1,unit:"份",price:5,checked:true});saveState();toast("已添加");renderRecipes()}};
+      $("#shoppingShare").onclick=()=>{const text=list.filter(i=>i.checked).map(i=>`${i.name} ${i.qty}${i.unit}`).join("\n");navigator.clipboard?.writeText(text);toast("清单已复制")};
+    }
+    function renderShoppingTab(){
+      const today=state.shopping?.today||[];
+      const week=state.shopping?.week||[];
+      const sumPrice=(list)=>list.filter(i=>i.checked!==false).reduce((s,i)=>s+Number(i.price||0),0);
+      $("#recipeContent").innerHTML=`<div class="card"><div class="sec">今日购物清单</div>
+        ${today.length?today.map(i=>`<label class="row space" style="margin:6px 0"><div>🛒 ${i.name}</div>
+          <div class="muted">${i.qty}${i.unit} · ¥${i.price}</div>
+          <input type="checkbox" data-today="${i.name}" ${i.checked!==false?"checked":""}/>
+        </label>`).join(""):"<div class='muted'>暂无，请先生成今日清单</div>"}
+        <div class="row space"><div class="muted">合计：¥${sumPrice(today)}</div><button class="btn ghost" id="addTodayItem">手动添加</button></div>
+        <div class="row space" style="margin-top:6px;"><button class="btn ghost" id="todayAll">全选</button><button class="btn ghost" id="todayNone">全不选</button></div>
+        <div class="row space" style="margin-top:10px;"><button class="btn secondary" id="regenTodayShop">生成今日清单</button><button class="btn ghost" id="shareTodayShop">分享清单</button></div>
+      </div>
+      <div class="card"><div class="sec">本周购物清单</div>
+        ${week.length?week.map(i=>`<label class="row space" style="margin:6px 0"><div>🧺 ${i.name}</div>
+          <div class="muted">${i.qty}${i.unit} · ¥${i.price}</div>
+          <input type="checkbox" data-week="${i.name}" ${i.checked!==false?"checked":""}/>
+        </label>`).join(""):"<div class='muted'>暂无，请先生成本周清单</div>"}
+        <div class="row space"><div class="muted">合计：¥${sumPrice(week)}</div><button class="btn ghost" id="addWeekItem">手动添加</button></div>
+        <div class="row space" style="margin-top:6px;"><button class="btn ghost" id="weekAll">全选</button><button class="btn ghost" id="weekNone">全不选</button></div>
+        <div class="row space" style="margin-top:10px;"><button class="btn secondary" id="regenWeekShop">生成本周清单</button><button class="btn ghost" id="shareWeekShop">分享清单</button></div>
+      </div>`;
+      $("#regenTodayShop").onclick=generateTodayShopping;
+      $("#regenWeekShop").onclick=shoppingList;
+      $("#shareTodayShop").onclick=()=>{const text=today.filter(i=>i.checked!==false).map(i=>`${i.name} ${i.qty}${i.unit}`).join("\n");navigator.clipboard?.writeText(text);toast("清单已复制")};
+      $("#shareWeekShop").onclick=()=>{const text=week.filter(i=>i.checked!==false).map(i=>`${i.name} ${i.qty}${i.unit}`).join("\n");navigator.clipboard?.writeText(text);toast("清单已复制")};
+      $("#addTodayItem").onclick=()=>{const name=prompt("食材名");if(name){state.shopping.today.push({name,qty:1,unit:"份",price:5,checked:true});saveState();renderShoppingTab()}};
+      $("#addWeekItem").onclick=()=>{const name=prompt("食材名");if(name){state.shopping.week.push({name,qty:1,unit:"份",price:5,checked:true});saveState();renderShoppingTab()}};
+      $("#todayAll").onclick=()=>{state.shopping.today.forEach(i=>i.checked=true);saveState();renderShoppingTab()};
+      $("#todayNone").onclick=()=>{state.shopping.today.forEach(i=>i.checked=false);saveState();renderShoppingTab()};
+      $("#weekAll").onclick=()=>{state.shopping.week.forEach(i=>i.checked=true);saveState();renderShoppingTab()};
+      $("#weekNone").onclick=()=>{state.shopping.week.forEach(i=>i.checked=false);saveState();renderShoppingTab()};
+      $$("input[data-today]").forEach(el=>el.onchange=()=>{const item=state.shopping.today.find(x=>x.name===el.dataset.today);if(item){item.checked=el.checked;saveState();renderShoppingTab()}});
+      $$("input[data-week]").forEach(el=>el.onchange=()=>{const item=state.shopping.week.find(x=>x.name===el.dataset.week);if(item){item.checked=el.checked;saveState();renderShoppingTab()}});
+    }
+    function renderLibrary(){
+      const cats=["全部","主食","家常菜","汤类","凉菜","中式包点","烘焙","甜品","饮品"];
+      $("#recipeContent").innerHTML=`<div class="tabs" id="libraryCats">${cats.map(c=>`<div class="tab-pill" data-c="${c}">${c}</div>`).join("")}</div>
+        <div class="card"><div class="muted">筛选栏</div><div class="row" style="gap:6px;flex-wrap:wrap">
+          <div class="pill">用餐时间：全部</div><div class="pill">热量：全部</div><div class="pill">匹配：全部</div></div></div>
+        <div class="lib" id="libraryList"></div>`;
+      let active="全部";const render=()=>{let list=recipesDB;if(active!=="全部") list=list.filter(r=>r.category===active);
+        $("#libraryList").innerHTML=list.map(r=>{const m=score(r);return `<div class="card" data-recipe="${r.name}">
+          <div class="lib-emoji">${r.emoji}</div><div style="flex:1"><div style="font-weight:800">${r.name}</div>
+          <div class="muted">${r.category} · ${r.mealType.join("/")}</div></div>
+          <div class="tag ${m>0.8?"ok":"warn"}">${m>0.8?"完全匹配":"差1~2种"}</div></div>`}).join("");
+        $$("#libraryList .card").forEach(el=>el.onclick=()=>openRecipe(el.dataset.recipe))};
+      $$("#libraryCats .tab-pill").forEach(el=>el.onclick=()=>{$$("#libraryCats .tab-pill").forEach(x=>x.classList.remove("active"));el.classList.add("active");active=el.dataset.c;render()});
+      $$("#libraryCats .tab-pill")[0].classList.add("active");render();
+    }
+
+    function renderMe(){
+      const avatars=["👩‍🍳","👨‍🍳","🦊","🐼","🐰","🐯","🐸","🦁"];
+      $("#meContent").innerHTML=`<div class="card welcome"><div class="row space">
+        <div class="row"><div style="font-size:36px;cursor:pointer" id="avatarPick">${state.user.avatar}</div>
+          <div style="margin-left:10px"><div class="title" id="editName">${state.user.name}</div><div class="pill" id="editGoal">${state.user.goal}</div></div></div>
+        <div class="muted">${state.fridge.length}种食材</div></div>
+        <div class="row space" style="margin-top:10px;"><div>❤️收藏 ${state.favorites.length}</div><div>🍳已做 ${state.cookedLog.length}</div></div></div>
+        <div class="card"><div class="sec">数据看板</div>
+          <div class="kpi">
+            <div class="card"><div class="muted">新增食材</div><div class="value">${sum(state.dataLog,"added")} 种</div></div>
+            <div class="card"><div class="muted">过期丢弃</div><div class="value">${sum(state.dataLog,"wasted")} 种</div></div>
+            <div class="card"><div class="muted">已烹饪</div><div class="value">${sum(state.dataLog,"cooked")} 道</div></div>
+            <div class="card"><div class="muted">平均热量</div><div class="value">${Math.round(avg(state.dataLog,"calories"))} kcal</div></div>
+          </div>
+          <div class="row space muted" style="margin-top:8px;"><span>本周新增趋势</span><span>单位：种/天</span></div><canvas id="chartAdd" width="300" height="120"></canvas>
+          <div class="row space muted"><span>过期丢弃趋势</span><span>单位：种/天</span></div><canvas id="chartWaste" width="300" height="120"></canvas>
+          <div class="row space muted"><span>热量趋势</span><span>单位：kcal/天</span></div><canvas id="chartCal" width="300" height="120"></canvas></div>
+        <div class="card"><div class="sec">冰箱收纳布局</div>
+          <div class="row space" style="margin-bottom:8px;">
+            <div class="muted">当前：${state.user.fridgeLayout}</div>
+            <select id="layoutSelect">
+              ${["单门冰箱","法式三门冰箱","十字冰箱","海尔413法式双开门"].map(l=>`<option ${state.user.fridgeLayout===l?"selected":""}>${l}</option>`).join("")}
+            </select>
+          </div>
+          <div class="fridge-layout" id="fridgeLayoutGrid"></div>
+        </div>
+        <div class="card"><div class="sec">家庭冰箱</div><div id="familyBlock"></div></div>
+        <div class="card"><div class="sec">❤️我的收藏</div><div class="scroll">${state.favorites.map(n=>{const r=recipesDB.find(x=>x.name===n);return r?recipeCard(r):""}).join("")||"<div class='muted'>暂无收藏</div>"}</div></div>
+        <div class="card"><div class="sec">⚙️设置</div>
+          <div class="row space"><div>过期提醒天数</div><input id="remindRange" type="range" min="1" max="14" value="${state.user.remindDays}" /><div>${state.user.remindDays}天</div></div>
+          <div class="row space" style="margin-top:10px;"><div>用餐人数</div><input id="peopleRange" type="range" min="1" max="6" value="${state.user.people}" /><div>${state.user.people}人</div></div>
+          <div class="row space" style="margin-top:10px;"><div>显示下午茶</div><input id="snackToggle" type="checkbox" ${state.user.showSnack?"checked":""} /></div>
+          <div class="row space" style="margin-top:10px;"><div>深色模式</div><input id="darkToggle" type="checkbox" ${state.user.darkMode?"checked":""} /></div></div>`;
+      renderFamily(); $$("#meContent .recipe").forEach(el=>el.onclick=()=>openRecipe(el.dataset.recipe));
+      $("#avatarPick").onclick=()=>{const pick=avatars[(avatars.indexOf(state.user.avatar)+1)%avatars.length];state.user.avatar=pick;saveState();renderMe()};
+      $("#editName").onclick=()=>{const n=prompt("昵称",state.user.name);if(n){state.user.name=n;saveState();renderMe();renderHome()}};
+      $("#editGoal").onclick=()=>{const g=prompt("健康目标：均衡营养/减脂控卡/增肌补蛋白/清淡饮食/儿童营养/老年健康",state.user.goal);if(g){state.user.goal=g;saveState();renderAll()}};
+      $("#remindRange").oninput=e=>{state.user.remindDays=Number(e.target.value);saveState();renderAll()};
+      $("#peopleRange").oninput=e=>{state.user.people=Number(e.target.value);saveState();renderToday();renderMe()};
+      $("#snackToggle").onchange=e=>{state.user.showSnack=e.target.checked;saveState();renderHome();renderToday();};
+      renderFridgeLayout();
+      $$("#layoutSelect").forEach(el=>el.onchange=()=>{state.user.fridgeLayout=el.value;saveState();renderMe();});
+      $("#darkToggle").onchange=e=>{state.user.darkMode=e.target.checked;applyTheme();saveState()};
+      drawCharts();
+    }
+    function renderFamily(){
+      const wrap=$("#familyBlock");const fam=state.family;
+      if(!fam){wrap.innerHTML=`<div class="row space"><button class="btn ghost" id="createFamily">创建家庭组</button><button class="btn secondary" id="joinFamily">加入家庭组</button></div>`;
+        $("#createFamily").onclick=()=>{const name=prompt("家庭名");if(name){state.family={name,code:Math.random().toString(36).slice(2,8).toUpperCase(),members:[state.user.avatar]};saveState();renderFamily()}};
+        $("#joinFamily").onclick=()=>{const code=prompt("邀请码");if(code){state.family={name:"好友的厨房",code,members:[state.user.avatar,"🐰","🐼"]};saveState();renderFamily()}}}
+      else{wrap.innerHTML=`<div class="row space"><div><strong>${fam.name}</strong></div><button class="btn ghost" id="inviteFamily">邀请成员</button></div>
+        <div class="row" style="margin-top:8px;">${fam.members.map(m=>`<div style="font-size:26px;">${m}</div>`).join("")}</div>`;$("#inviteFamily").onclick=()=>alert(`邀请码：${fam.code}`)}
+    }
+    function drawCharts(){drawBar($("#chartAdd"),state.dataLog.map(d=>d.added),"#4CAF82");drawBar($("#chartWaste"),state.dataLog.map(d=>d.wasted),"#FF8C42");drawLine($("#chartCal"),state.dataLog.map(d=>d.calories),"#4CAF82")}
+    function drawBar(canvas,data,color){if(!canvas) return;const ctx=canvas.getContext("2d");const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);const max=Math.max(...data,1);const bw=w/data.length-6;
+      data.forEach((v,i)=>{const x=i*(bw+6)+3;const bh=(v/max)*(h-20);ctx.fillStyle=color;ctx.fillRect(x,h-bh-6,bw,bh)})}
+    function drawLine(canvas,data,color){if(!canvas) return;const ctx=canvas.getContext("2d");const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);const max=Math.max(...data,1);
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();data.forEach((v,i)=>{const x=i*(w/(data.length-1));const y=h-(v/max)*(h-20)-10;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();
+      ctx.setLineDash([6,4]);ctx.strokeStyle="#999";ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();ctx.setLineDash([])}
+
+    function renderFridgeLayout(){
+      const layout=state.user.fridgeLayout;
+      const grid=$("#fridgeLayoutGrid");
+      grid.className="fridge-layout"+(layout==="海尔413法式双开门"?" haier":"");
+      if(layout==="海尔413法式双开门"){
+        const cold=state.fridge.filter(f=>f.zone==="冷藏").length;
+        const fresh=state.fridge.filter(f=>f.zone==="蔬果格").length;
+        const freezer=state.fridge.filter(f=>f.zone==="冷冻").length;
+        const door=state.fridge.filter(f=>f.zone==="门架").length;
+        grid.innerHTML=`
+          <div class="fridge-cell fridge" data-zone="冷藏">
+            <div class="label">🧊 上部双开冷藏</div><div class="count">${cold}项</div>
+            <div class="mini">冷藏 · 宽门仓</div><div class="progress" style="margin-top:6px;"><span style="width:${Math.min(100,cold*10)}%"></span></div>
+          </div>
+          <div class="fridge-cell fresh" data-zone="蔬果格">
+            <div class="label">🥗 中部保鲜抽屉</div><div class="count">${fresh}项</div>
+            <div class="mini">果蔬保湿</div><div class="progress" style="margin-top:6px;"><span style="width:${Math.min(100,fresh*15)}%"></span></div>
+          </div>
+          <div class="fridge-cell drawers" data-zone="门架">
+            <div class="label">🚪 门体储物</div><div class="count">${door}项</div>
+            <div class="mini">调味/饮料</div><div class="progress" style="margin-top:6px;"><span style="width:${Math.min(100,door*20)}%"></span></div>
+          </div>
+          <div class="fridge-cell freezer" data-zone="冷冻">
+            <div class="label">❄️ 下部大抽屉冷冻</div><div class="count">${freezer}项</div>
+            <div class="mini">深冷分储</div><div class="progress" style="margin-top:6px;"><span style="width:${Math.min(100,freezer*12)}%"></span></div>
+          </div>`;
+      } else {
+        const map={
+          "单门冰箱":["冷藏","冷冻","蔬果格","门架"],
+          "法式三门冰箱":["冷藏","冷藏","蔬果格","冷冻","门架","门架"],
+          "十字冰箱":["冷藏","冷藏","蔬果格","蔬果格","冷冻","冷冻","门架","门架"]
+        };
+        const zones=map[layout]||map["单门冰箱"];
+        grid.innerHTML=zones.map(z=>{
+          const items=state.fridge.filter(f=>f.zone===z);
+          const pct=Math.min(100,items.length*20);
+          const icon=z==="冷藏"?"❄️":z==="冷冻"?"🧊":z==="蔬果格"?"🥗":"🚪";
+          return `<div class="fridge-cell" data-zone="${z}">
+            <div class="label">${icon} ${z}</div>
+            <div class="count">${items.length}项</div>
+            <div class="mini">容量 ${pct}%</div>
+            <div class="progress" style="margin-top:6px;"><span style="width:${pct}%"></span></div>
+          </div>`;
+        }).join("");
+      }
+      $$(".fridge-cell").forEach(el=>el.onclick=()=>{go("fridge");activeZone=el.dataset.zone;renderFridge();});
+    }
+
+    function bindPlanDrag(){
+      let dragEl=null;
+      $$(".plan-item").forEach(el=>{
+        el.addEventListener("dragstart",()=>{dragEl=el;el.classList.add("dragging")});
+        el.addEventListener("dragend",()=>{el.classList.remove("dragging");dragEl=null});
+      });
+      $$(".plan-list").forEach(list=>{
+        list.addEventListener("dragover",(e)=>{
+          e.preventDefault();
+          const afterElement=getDragAfterElement(list,e.clientY);
+          if(!dragEl) return;
+          if(afterElement==null) list.appendChild(dragEl); else list.insertBefore(dragEl,afterElement);
+        });
+        list.addEventListener("drop",()=>{
+          const meal=list.dataset.meal;
+          const names=[...list.querySelectorAll(".plan-item")].map(i=>i.dataset.name);
+          state.todayPlan[meal]=names.map(n=>recipesDB.find(r=>r.name===n)).filter(Boolean);
+          saveState();
+        });
+      });
+      function getDragAfterElement(container,y){
+        const els=[...container.querySelectorAll(".plan-item:not(.dragging)")];
+        return els.reduce((closest,child)=>{
+          const box=child.getBoundingClientRect();
+          const offset=y - box.top - box.height/2;
+          if(offset<0 && offset>closest.offset) return {offset,element:child};
+          return closest;
+        },{offset:Number.NEGATIVE_INFINITY}).element;
+      }
+    }
+
+    function openRecipe(name){
+      const r=recipesDB.find(x=>x.name===name);if(!r) return;$("#recipeModal").classList.add("active");
+      $("#modalTitle").textContent=`${r.emoji} ${r.name}`;const fav=state.favorites.includes(r.name);$("#modalFavBtn").textContent=fav?"💖":"🤍";
+      $("#modalMeta").textContent=`${r.category} · ${r.mealType.join("/")}`;
+      $("#modalInfo").innerHTML=`<div class="module"><div class="sec">基础信息</div>
+        <div class="info-grid">
+          <div class="info-chip">⏱ ${r.time} 分钟</div>
+          <div class="info-chip">👥 ${r.servings} 人份</div>
+          <div class="info-chip">⭐ ${r.difficulty}</div>
+          <div class="info-chip">🔥 ${r.totalCalories} kcal</div>
+        </div>
+      </div>
+      <div class="module"><div class="sec">营养标签</div>
+        <div class="row" style="gap:6px;flex-wrap:wrap">
+          <div class="pill">${r.caloriesLevel}</div>
+          ${r.healthTags.map(t=>`<div class="pill">${t}</div>`).join("")}
+        </div>
+      </div>`;
+      const names=state.fridge.map(f=>f.name);
+      $("#modalIngredients").innerHTML=r.ingredients.map(i=>{const has=names.includes(i.name);return `<div>${has?"✅":"❌"} ${i.name} ${i.amount}${i.unit} ${has?"（冰箱已有）":"（冰箱缺少）"}</div>`}).join("");
+      $("#modalSteps").innerHTML=r.steps.map((s,i)=>`<div>${i+1}. ${s}</div>`).join("");
+      const missing=r.ingredients.filter(i=>!names.includes(i.name)).map(i=>i.name);$("#modalMissing").innerHTML=missing.length?`<div class="module">还差：${missing.join("、")}</div>`:"";
+      $("#modalFavBtn").onclick=()=>{state.favorites=fav?state.favorites.filter(x=>x!==r.name):state.favorites.concat(r.name);saveState();openRecipe(r.name);renderMe()};
+      $("#addShoppingBtn").onclick=()=>toast("已加入购物清单");
+      $("#markCookedBtn").onclick=()=>{state.cookedLog.push({name:r.name,date:todayStr()});saveState();toast("已记录为今日已做");renderMe()};
+      $("#modalFavBtn").style.display="inline-flex";$("#addShoppingBtn").style.display="inline-flex";$("#markCookedBtn").style.display="inline-flex";
+    }
+    function openFoodModal(id){
+      const f=state.fridge.find(x=>x.id===id);if(!f) return;
+      $("#recipeModal").classList.add("active");
+      $("#modalTitle").textContent=`${f.emoji||"🍽️"} ${f.name}`;
+      $("#modalMeta").textContent=`${f.category} · ${f.zone}`;
+      const left=daysLeft(f.expire);
+      $("#modalInfo").innerHTML=`<div class="module"><div class="sec">食材信息</div>
+        <div class="info-grid">
+          <div class="info-chip">数量：${f.qty}${f.unit}</div>
+          <div class="info-chip">热量：${f.calories||0} kcal</div>
+          <div class="info-chip">过期：${f.expire}</div>
+          <div class="info-chip">${left<0?"已过期":`还剩 ${left} 天`}</div>
+        </div>
+      </div>${f.note?`<div class="module"><div class="sec">备注</div><div class="muted">${f.note}</div></div>`:""}`;
+      $("#modalIngredients").innerHTML="";
+      $("#modalSteps").innerHTML="";
+      $("#modalMissing").innerHTML="";
+      $("#modalFavBtn").style.display="none";
+      $("#addShoppingBtn").style.display="none";
+      $("#markCookedBtn").style.display="none";
+    }
+    $("#modalClose").onclick=()=>$("#recipeModal").classList.remove("active");
+    $("#recipeModal").addEventListener("click",e=>{if(e.target.id==="recipeModal") $("#recipeModal").classList.remove("active")});
+    function openModal(html){$("#recipeModal").classList.add("active");$("#modalTitle").textContent="🍱 购物清单";$("#modalMeta").textContent="";
+      $("#modalInfo").innerHTML="";$("#modalIngredients").innerHTML=html;$("#modalSteps").innerHTML="";$("#modalMissing").innerHTML="";
+      $("#modalFavBtn").style.display="none";$("#addShoppingBtn").style.display="none";$("#markCookedBtn").style.display="none";}
+
+    function go(name){
+      $$(".page").forEach(p=>p.classList.remove("active"));$(`.page[data-page="${name}"]`).classList.add("active");
+      $$(".nav .tab").forEach(t=>t.classList.remove("active"));$(`.nav .tab[data-target="${name}"]`).classList.add("active");
+      if(name==="home") renderHome(); if(name==="fridge") renderFridge(); if(name==="manage") renderManage(); if(name==="recipes") renderRecipes(); if(name==="me") renderMe();
+    }
+    $$(".nav .tab").forEach(t=>t.addEventListener("click",()=>{t.classList.add("pressed");setTimeout(()=>t.classList.remove("pressed"),180);go(t.dataset.target);}));
+    function applyTheme(){ $("#app").setAttribute("data-theme", state.user.darkMode?"dark":"light"); }
+    function renderAll(){renderHome();renderFridge();renderManage();renderRecipes();renderMe();}
+    function guessEmoji(name){if(name.includes("蛋"))return"🥚";if(name.includes("番茄"))return"🍅";if(name.includes("土豆"))return"🥔";if(name.includes("黄瓜"))return"🥒";if(name.includes("西兰花"))return"🥦";if(name.includes("肉"))return"🥩";if(name.includes("鱼"))return"🐟";if(name.includes("虾"))return"🦐";if(name.includes("牛奶"))return"🥛";return"🍽️";}
+    const shuffle=a=>a.sort(()=>Math.random()-.5);const sum=(l,k)=>l.reduce((s,i)=>s+i[k],0);const avg=(l,k)=>sum(l,k)/l.length;
+
+    applyTheme();renderAll();
+  </script>
+</body>
+</html>

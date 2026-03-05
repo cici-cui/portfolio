@@ -1,0 +1,71 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact | 崔茹</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="hover:text-deep" href="index.html">Home</a>
+          <a class="hover:text-deep" href="experience.html">Experience</a>
+          <a class="hover:text-deep" href="projects.html">Projects</a>
+          <a class="hover:text-deep" href="methodology.html">Methodology</a>
+          <a class="hover:text-deep" href="insights.html">Insights</a>
+          <a class="hover:text-deep" href="resume.html">Resume</a>
+          <a class="hover:text-deep" href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Contact -->
+    <section class="mx-auto max-w-6xl px-6 py-16 space-y-10">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-slate-400">Contact</p>
+        <h1 class="text-3xl md:text-4xl font-semibold">联系方式</h1>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <div class="space-y-4 text-slate-600">
+          <p>电话：19842364506</p>
+          <p>邮箱：642813058@qq.com</p>
+          <p>GitHub / 小红书（占位链接）</p>
+          <blockquote class="border-l-2 border-bright pl-4 text-deep">
+            希望参与 AI 平台与系统型产品建设, 持续提升结构抽象与规则设计能力
+          </blockquote>
+        </div>
+        <div class="bg-slate-100 rounded-lg h-56 flex items-center justify-center text-slate-400">
+          社媒/二维码占位
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

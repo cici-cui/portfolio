@@ -1,0 +1,93 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resume | 崔茹</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="hover:text-deep" href="index.html">Home</a>
+          <a class="hover:text-deep" href="experience.html">Experience</a>
+          <a class="hover:text-deep" href="projects.html">Projects</a>
+          <a class="hover:text-deep" href="methodology.html">Methodology</a>
+          <a class="hover:text-deep" href="insights.html">Insights</a>
+          <a class="hover:text-deep" href="resume.html">Resume</a>
+          <a class="hover:text-deep" href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Resume -->
+    <section class="mx-auto max-w-6xl px-6 py-16 space-y-10">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-sm uppercase tracking-widest text-slate-400">Resume</p>
+          <h1 class="text-3xl md:text-4xl font-semibold">教育与技能</h1>
+        </div>
+        <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="#">Download PDF</a>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <div class="space-y-6">
+          <div>
+            <h2 class="font-semibold text-xl">Education</h2>
+            <div class="text-slate-600 mt-3 space-y-2">
+              <p>华南师范大学 会计 硕士 2025.09–2027.06</p>
+              <p>华南师范大学 财务管理 本科 2021.09–2025.06</p>
+            </div>
+          </div>
+          <div>
+            <h2 class="font-semibold text-xl">Core Skills</h2>
+            <ul class="text-slate-600 list-disc list-inside mt-3">
+              <li>跨团队协作、0→1 产品设计、AI 平台与中后台系统</li>
+              <li>模型调优与 API 集成、数据分析与优化、PRD 输出与产品迭代</li>
+            </ul>
+          </div>
+          <div>
+            <h2 class="font-semibold text-xl">Tools</h2>
+            <p class="text-slate-600 mt-3">Excel、SQL、Figma、Stata、PRD撰写</p>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <h2 class="font-semibold text-xl">Language and Certificates</h2>
+            <p class="text-slate-600 mt-3">英语 雅思 6.5 / CET-6</p>
+            <p class="text-slate-600 mt-2">计算机二级证书、初级会计师资格证</p>
+          </div>
+          <div class="bg-slate-100 rounded-lg h-56 flex items-center justify-center text-slate-400">
+            证书/作品集封面占位
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

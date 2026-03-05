@@ -1,0 +1,680 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>崔茹 | AI系统与平台型产品经理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#007BFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .fade-in { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+    .fade-in.is-visible { opacity: 1; transform: translateY(0); }
+    .parallax { will-change: transform; }
+    .flip-card { perspective: 1000px; }
+    .flip-inner { transition: transform .7s ease; transform-style: preserve-3d; }
+    .flip-card:hover .flip-inner { transform: rotateY(180deg); }
+    .flip-front, .flip-back { backface-visibility: hidden; }
+    .flip-back { transform: rotateY(180deg); }
+    .nav-link.active { color: #0D3B66; font-weight: 600; }
+    .section-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border:1px solid #E6EEF6; border-radius:999px; color:#0D3B66; background:#F7FAFF; font-size:12px; }
+    .icon-dot { width:8px; height:8px; border-radius:999px; background:#007BFF; display:inline-block; }
+  </style>
+</head>
+<body class="bg-white text-deep font-sans">
+  <div class="min-h-screen">
+    <!-- Scroll Progress -->
+    <div class="fixed top-0 left-0 h-1 bg-bright z-20" id="progress"></div>
+
+    <!-- Navigation -->
+    <header class="border-b border-slate-100 sticky top-0 bg-white/90 backdrop-blur z-10">
+      <div class="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">崔茹</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <a class="nav-link hover:text-deep" href="#home">主页</a>
+          <a class="nav-link hover:text-deep" href="#experience">经历</a>
+          <a class="nav-link hover:text-deep" href="#projects">项目</a>
+          <a class="nav-link hover:text-deep" href="#methodology">方法论</a>
+          <a class="nav-link hover:text-deep" href="#insights">观点</a>
+          <a class="nav-link hover:text-deep" href="#resume">简历</a>
+          <a class="nav-link hover:text-deep" href="#contact">联系</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Home -->
+    <section id="home" class="mx-auto max-w-6xl px-6 py-16">
+      <!-- Hero Section -->
+      <div class="grid gap-10 md:grid-cols-2 items-center">
+        <div class="space-y-6 fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> AI Systems Product Manager</div>
+          <h1 class="text-4xl md:text-5xl font-semibold text-deep">崔茹</h1>
+          <p class="text-xl text-slate-600">AI系统与平台型产品经理</p>
+          <ul class="space-y-2 text-slate-600">
+            <li>0→1 AI自动化 SKU 系统</li>
+            <li>规则引擎构建</li>
+            <li>自动化效率提升 80%+</li>
+          </ul>
+          <div class="flex flex-wrap gap-4">
+            <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="#projects-tob">查看 ToB 项目</a>
+            <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="#projects-toc">查看 ToC 项目</a>
+          </div>
+        </div>
+        <div class="relative parallax fade-in" data-parallax="0.25">
+          <div class="bg-slate-100 rounded-2xl h-64 md:h-80 flex items-center justify-center text-slate-400">
+            系统架构/原型图占位
+          </div>
+          <div class="absolute -bottom-6 -left-6 bg-white border border-slate-100 rounded-xl p-4 shadow-sm w-44">
+            <div class="text-xs text-slate-500">效率提升</div>
+            <div class="text-xl font-semibold text-bright">80%+</div>
+            <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-bright w-4/5"></div>
+            </div>
+          </div>
+          <div class="absolute -top-6 -right-6 bg-white border border-slate-100 rounded-xl p-4 shadow-sm w-44">
+            <div class="text-xs text-slate-500">规则引擎覆盖</div>
+            <div class="text-xl font-semibold text-deep">多模型</div>
+            <div class="mt-2 text-xs text-slate-500">插件化策略</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Ability Grid -->
+      <div class="mt-14">
+        <h2 class="text-2xl font-semibold mb-8 fade-in">核心能力矩阵</h2>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <h3 class="font-semibold">系统抽象能力</h3>
+                <p class="text-slate-600 mt-2">将复杂业务逻辑抽象为可扩展规则</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">补充说明：规则层与能力层分离，支持快速扩展。</p>
+                <div class="mt-4 h-20 bg-slate-100 rounded flex items-center justify-center text-slate-400">小图示占位</div>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <h3 class="font-semibold">0→1 中后台设计</h3>
+                <p class="text-slate-600 mt-2">自动化配置与规则引擎</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">补充说明：配置驱动流程，减少手动配置成本。</p>
+                <div class="mt-4 h-20 bg-slate-100 rounded flex items-center justify-center text-slate-400">小图示占位</div>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <h3 class="font-semibold">数据驱动优化</h3>
+                <p class="text-slate-600 mt-2">A/B测试 + 行为数据分析</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">补充说明：指标闭环追踪，优化策略迭代。</p>
+                <div class="mt-4 h-20 bg-slate-100 rounded flex items-center justify-center text-slate-400">小图示占位</div>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <h3 class="font-semibold">跨团队协作</h3>
+                <p class="text-slate-600 mt-2">PRD输出 + 原型推动落地</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">补充说明：联合研发与运营，高效落地。</p>
+                <div class="mt-4 h-20 bg-slate-100 rounded flex items-center justify-center text-slate-400">小图示占位</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="mt-12">
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="border border-slate-100 rounded-xl p-6 fade-in">
+            <div class="text-3xl font-semibold text-bright" data-count="80" data-display="80%+">0</div>
+            <p class="text-slate-600 mt-2">自动化效率提升 80%+</p>
+            <div class="mt-3 h-10 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400">迷你图表占位</div>
+          </div>
+          <div class="border border-slate-100 rounded-xl p-6 fade-in">
+            <div class="text-3xl font-semibold text-bright" data-count="44" data-display="4.4w">0</div>
+            <p class="text-slate-600 mt-2">内容粉丝 4.4w</p>
+            <div class="mt-3 h-10 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400">趋势占位</div>
+          </div>
+          <div class="border border-slate-100 rounded-xl p-6 fade-in">
+            <div class="text-3xl font-semibold text-bright" data-count="100" data-display="100+">0</div>
+            <p class="text-slate-600 mt-2">商业合作 100+</p>
+            <div class="mt-3 h-10 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400">分布占位</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-10">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Experience</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">万兴科技 (Wondershare)</h2>
+          <p class="text-slate-600 mt-2">中后台 AI 产品经理实习 · 2026.01 – 2026.04</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="space-y-4 fade-in">
+            <div>
+              <h3 class="font-semibold">项目背景</h3>
+              <p class="text-slate-600">AI平台自动化 SKU 配置系统</p>
+            </div>
+            <details class="border border-slate-100 rounded-lg p-4">
+              <summary class="cursor-pointer font-semibold">系统挑战</summary>
+              <div class="mt-3 text-slate-600 space-y-1">
+                <p>多模型多服务并存</p>
+                <p>成本结构复杂</p>
+                <p>手动配置效率低</p>
+              </div>
+            </details>
+            <details class="border border-slate-100 rounded-lg p-4">
+              <summary class="cursor-pointer font-semibold">我的工作内容</summary>
+              <div class="mt-3 text-slate-600 space-y-1">
+                <p>规则引擎设计</p>
+                <p>PRD输出, 原型设计</p>
+                <p>数据分析优化</p>
+              </div>
+            </details>
+            <details class="border border-slate-100 rounded-lg p-4">
+              <summary class="cursor-pointer font-semibold">成果</summary>
+              <div class="mt-3 text-slate-600 space-y-1">
+                <p>自动化效率提升 80%+</p>
+                <p>系统稳定性与扩展性提升</p>
+              </div>
+            </details>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-slate-100 rounded-2xl h-48 overflow-hidden parallax fade-in" data-parallax="0.18">
+              <img src="assets/AI服务成本自动化配置-AIMS系统优化-流程图.jpg" alt="流程/架构图" class="w-full h-full object-cover">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-14">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Projects</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">重点项目</h2>
+        </div>
+
+        <!-- ToB Project -->
+        <div id="projects-tob" class="space-y-6">
+          <h3 class="text-2xl font-semibold fade-in">ToB · AI 自动化 SKU 系统</h3>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-4 fade-in">
+              <div>
+                <h4 class="font-semibold">问题</h4>
+                <p class="text-slate-600">占位文本：描述业务痛点与关键约束。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">系统架构</h4>
+                <p class="text-slate-600">占位文本：系统模块与协作关系。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">解决方案</h4>
+                <p class="text-slate-600">占位文本：规则引擎与自动化流程设计。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">成果</h4>
+                <p class="text-slate-600">占位文本：关键指标提升与业务价值。</p>
+              </div>
+              <div class="border border-slate-100 rounded-lg p-4">
+                <h4 class="font-semibold">原型展示（成本自动化配置）</h4>
+                <p class="text-slate-600 mt-2">AIMS 成本配置原型，覆盖算子/工作流计费配置与规则管理。</p>
+                <a class="mt-3 inline-flex px-4 py-2 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition"
+                   href="file:///C:/Users/ws/portfolio/assets/cost-config2.html" target="_blank" rel="noopener">
+                  打开原型页面
+                </a>
+                <div class="mt-4 rounded-lg border border-slate-100 overflow-hidden bg-white">
+                  <div class="px-3 py-2 text-xs text-slate-500 border-b border-slate-100">内嵌预览</div>
+                  <iframe class="w-full h-72 md:h-80" src="file:///C:/Users/ws/portfolio/assets/cost-config2.html" title="成本配置原型预览"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-3 fade-in">
+              <div class="bg-slate-100 rounded-2xl h-44 overflow-hidden hover:shadow-md transition">
+                <img src="assets/AI服务成本自动化配置-AIMS系统优化-流程图.jpg" alt="AIMS系统流程图" class="w-full h-full object-cover">
+              </div>
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-slate-100 rounded-xl h-20 overflow-hidden">
+                  <img src="assets/cost-config2.png" alt="成本配置原型" class="w-full h-full object-cover">
+                </div>
+                <div class="bg-slate-100 rounded-xl h-20 flex items-center justify-center text-slate-400">计费规则</div>
+                <div class="bg-slate-100 rounded-xl h-20 flex items-center justify-center text-slate-400">KPI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ToC Project -->
+        <div id="projects-toc" class="space-y-6">
+          <h3 class="text-2xl font-semibold fade-in">ToC · 冰箱库存管理</h3>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-4 fade-in">
+              <div>
+                <h4 class="font-semibold">用户痛点</h4>
+                <p class="text-slate-600">占位文本：用户行为与痛点描述。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">产品结构</h4>
+                <p class="text-slate-600">占位文本：核心模块与功能路径。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">MVP设计</h4>
+                <p class="text-slate-600">占位文本：最小可行产品与验证策略。</p>
+              </div>
+              <div>
+                <h4 class="font-semibold">成果数据</h4>
+                <p class="text-slate-600">占位文本：转化、留存或效率数据。</p>
+              </div>
+              <div class="border border-slate-100 rounded-lg p-4">
+                <h4 class="font-semibold">案例展示（冰箱容量网站）</h4>
+                <p class="text-slate-600 mt-2">基于移动端交互的「冰箱管家」原型，实现库存、过期提醒、食谱、购物清单与家庭协同。</p>
+                <a class="mt-3 inline-flex px-4 py-2 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition"
+                   href="file:///C:/Users/ws/Desktop/%E5%B4%94%E8%8C%B9/%E5%AE%9E%E4%B9%A0/v4.html" target="_blank" rel="noopener">
+                  打开案例原型
+                </a>
+                <div class="mt-4 rounded-lg border border-slate-100 overflow-hidden bg-white">
+                  <div class="px-3 py-2 text-xs text-slate-500 border-b border-slate-100">内嵌预览</div>
+                  <iframe class="w-full h-72 md:h-80" src="file:///C:/Users/ws/Desktop/%E5%B4%94%E8%8C%B9/%E5%AE%9E%E4%B9%A0/v4.html" title="冰箱容量网站预览"></iframe>
+                </div>
+              </div>
+              <div class="border border-slate-100 rounded-lg p-4">
+                <h4 class="font-semibold">分析要点</h4>
+                <ul class="mt-2 list-disc list-inside text-slate-600 space-y-1">
+                  <li>结构：五页主导航 + 模块化卡片，信息层级清晰。</li>
+                  <li>功能：库存管理、临期提醒、食谱推荐、购物清单、家庭组协同。</li>
+                  <li>体验：轻量交互（抽屉弹层/拖拽/筛选）与数据看板增强可控感。</li>
+                  <li>系统性：支持多布局冰箱模型与可配置规则，利于扩展。</li>
+                </ul>
+              </div>
+            </div>
+            <div class="space-y-3 fade-in">
+              <div class="bg-slate-100 rounded-2xl h-44 overflow-hidden hover:shadow-md transition">
+                <img src="assets/fridge-v4.png" alt="冰箱管家原型" class="w-full h-full object-cover">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-100 rounded-xl h-20 overflow-hidden">
+                  <img src="assets/fridge-v4.png" alt="首页截图" class="w-full h-full object-cover">
+                </div>
+                <div class="bg-slate-100 rounded-xl h-20 flex items-center justify-center text-slate-400">库存页</div>
+                <div class="bg-slate-100 rounded-xl h-20 flex items-center justify-center text-slate-400">食谱页</div>
+                <div class="bg-slate-100 rounded-xl h-20 flex items-center justify-center text-slate-400">我的页</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Work Gallery -->
+        <div class="space-y-4 fade-in">
+          <h3 class="text-2xl font-semibold">作品截图墙</h3>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="bg-slate-100 rounded-2xl overflow-hidden">
+              <img src="assets/AI服务成本自动化配置-AIMS系统优化-流程图.jpg" alt="AIMS流程图" class="w-full h-56 object-cover">
+            </div>
+            <div class="bg-slate-100 rounded-2xl overflow-hidden">
+              <img src="assets/cost-config2.png" alt="成本配置原型" class="w-full h-56 object-cover">
+            </div>
+            <div class="bg-slate-100 rounded-2xl overflow-hidden">
+              <img src="assets/fridge-v4.png" alt="冰箱管家原型" class="w-full h-56 object-cover">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Methodology -->
+    <section id="methodology" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-8">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Methodology</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">我的产品方法框架</h2>
+          <p class="text-slate-600 mt-2">产品的稳定性, 来自结构清晰的规则体系</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2 relative">
+          <div class="hidden md:block absolute left-1/2 -translate-x-1/2 top-2 bottom-2 w-px bg-slate-100"></div>
+          <div class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition fade-in">
+            <div class="text-bright font-semibold flex items-center gap-2">阶段 1 <span class="inline-block w-2 h-2 rounded-full bg-bright"></span></div>
+            <h3 class="mt-2 text-xl font-semibold">问题抽象</h3>
+            <p class="text-slate-600 mt-2">聚焦用户目标与业务约束, 建立统一问题模型。</p>
+          </div>
+          <div class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition fade-in">
+            <div class="text-bright font-semibold flex items-center gap-2">阶段 2 <span class="inline-block w-2 h-2 rounded-full bg-bright"></span></div>
+            <h3 class="mt-2 text-xl font-semibold">系统建模</h3>
+            <p class="text-slate-600 mt-2">拆解系统模块与流程, 建立可扩展架构。</p>
+          </div>
+          <div class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition fade-in">
+            <div class="text-bright font-semibold flex items-center gap-2">阶段 3 <span class="inline-block w-2 h-2 rounded-full bg-bright"></span></div>
+            <h3 class="mt-2 text-xl font-semibold">规则设计</h3>
+            <p class="text-slate-600 mt-2">输出规则与策略集合, 保障逻辑稳定与复用。</p>
+          </div>
+          <div class="border border-slate-100 rounded-lg p-6 hover:shadow-md transition fade-in">
+            <div class="text-bright font-semibold flex items-center gap-2">阶段 4 <span class="inline-block w-2 h-2 rounded-full bg-bright"></span></div>
+            <h3 class="mt-2 text-xl font-semibold">数据验证</h3>
+            <p class="text-slate-600 mt-2">通过数据验证与迭代优化形成闭环。</p>
+          </div>
+        </div>
+        <div class="bg-slate-100 rounded-lg h-56 flex items-center justify-center text-slate-400 fade-in">
+          方法框架示意图占位
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights -->
+    <section id="insights" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-10">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Insights</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">文章与观点</h2>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <div class="h-24 bg-slate-100 rounded-md mb-3 flex items-center justify-center text-slate-400 text-xs">封面图占位</div>
+                <h3 class="font-semibold text-lg">AI Agent 在企业中的落地路径</h3>
+                <p class="text-slate-600 mt-3">占位摘要：从试点到规模化的关键条件与协作路径。</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">占位扩展：关键指标、组织协作与治理框架。</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <div class="h-24 bg-slate-100 rounded-md mb-3 flex items-center justify-center text-slate-400 text-xs">封面图占位</div>
+                <h3 class="font-semibold text-lg">规则引擎在平台型产品中的价值</h3>
+                <p class="text-slate-600 mt-3">占位摘要：规则体系如何提升稳定性与扩展性。</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">占位扩展：抽象层、策略层与执行层。</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card fade-in">
+            <div class="flip-inner border border-slate-100 rounded-lg p-6 hover:shadow-md transition">
+              <div class="flip-front">
+                <div class="h-24 bg-slate-100 rounded-md mb-3 flex items-center justify-center text-slate-400 text-xs">封面图占位</div>
+                <h3 class="font-semibold text-lg">中后台产品与C端产品的差异</h3>
+                <p class="text-slate-600 mt-3">占位摘要：从目标、流程与协作方式的对比。</p>
+              </div>
+              <div class="flip-back absolute inset-0 p-6 rounded-lg border border-slate-100 bg-white">
+                <p class="text-slate-600">占位扩展：交付节奏与价值衡量方式。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resume -->
+    <section id="resume" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-8">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Resume</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">个人简历档案集</h2>
+          <p class="text-slate-600 mt-2">电话：19842364506｜邮箱：642813058@qq.com｜27届应届生｜立即到岗</p>
+        </div>
+
+        <!-- Education -->
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="border border-slate-100 rounded-2xl p-6 fade-in md:col-span-1">
+            <div class="bg-slate-100 rounded-2xl overflow-hidden">
+              <img src="assets/简历照片.jpg" alt="简历照片" class="w-full h-64 object-cover">
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-slate-600">
+              <div class="flex items-center gap-2"><span class="icon-dot"></span> AI 系统型产品经理</div>
+              <div class="flex items-center gap-2"><span class="icon-dot"></span> 中后台/平台型</div>
+              <div class="flex items-center gap-2"><span class="icon-dot"></span> 立即到岗</div>
+            </div>
+          </div>
+          <div class="border border-slate-100 rounded-2xl p-6 fade-in md:col-span-2">
+          <h3 class="text-xl font-semibold">教育经历</h3>
+          <div class="mt-4 text-slate-600 space-y-2">
+            <p>华南师范大学（211）｜会计｜硕士 2025.09 -- 2027.06</p>
+            <p>华南师范大学（211）｜财务管理｜本科 2021.09 -- 2025.06</p>
+          </div>
+          <div class="mt-4 grid grid-cols-3 gap-3">
+            <div class="bg-slate-100 rounded-lg h-16 flex items-center justify-center text-slate-400 text-xs">证书封面</div>
+            <div class="bg-slate-100 rounded-lg h-16 flex items-center justify-center text-slate-400 text-xs">竞赛奖项</div>
+            <div class="bg-slate-100 rounded-lg h-16 flex items-center justify-center text-slate-400 text-xs">课程模块</div>
+          </div>
+          </div>
+        </div>
+
+        <!-- Experience Details -->
+        <div class="border border-slate-100 rounded-xl p-6 fade-in">
+          <h3 class="text-xl font-semibold">项目经历</h3>
+          <div class="mt-4 space-y-6 text-slate-600">
+            <div>
+              <div class="font-semibold text-deep">万兴科技（Wondershare） | 中后台 AI 产品经理实习</div>
+              <div class="text-sm text-slate-500">2026.01 – 2026.04</div>
+              <div class="mt-3 font-semibold text-deep">核心职责</div>
+              <ul class="mt-2 list-disc list-inside space-y-1">
+                <li>跨团队协作与产品落地：与开发、算法和运营团队紧密合作，输出 PRD、流程图和原型，推动产品功能按时上线，确保 AI 能力的规模化落地，并提升团队之间的沟通和协作效率。</li>
+                <li>AI 平台自动化 SKU 配置系统 0→1 设计：优化并实现了支持算子/工作流模式的多维度 SKU 配置和计费规则引擎，通过自动化配置将操作效率提升 >80%，显著减少了人工成本。</li>
+                <li>AI 规则引擎与计费系统设计与优化：设计并优化了多模型、多服务类别差异化计费策略，利用模型调优和性能监控机制，确保系统的稳定性与准确性，推动产品不断优化。</li>
+                <li>数据驱动决策与持续优化：根据用户行为数据反馈，优化了产品功能，提升了用户体验和系统稳定性，推动了产品的持续迭代与功能完善。</li>
+              </ul>
+              <div class="mt-3 font-semibold text-deep">关键技能</div>
+              <p class="mt-1">跨团队协作与产品落地 | 0→1 产品设计 | AI 平台与中后台系统 | 模型调优与API集成 | 数据分析与优化 | PRD 输出与产品迭代</p>
+            </div>
+
+            <div>
+              <div class="font-semibold text-deep">剪映导入功能优化项目｜产品经理</div>
+              <div class="text-sm text-slate-500">2025.10 -- 2025.11</div>
+              <ul class="mt-2 list-disc list-inside space-y-1">
+                <li>竞品分析与痛点提炼：调研3款主流剪辑APP，发现素材导入渠道繁琐，进度展示不足，提出核心问题为导入效率低、流程复杂，基于此提出3项优化方案。</li>
+                <li>产品设计与优化：新增“日期一键导入+滑动勾选”，支持按日期批量选素材，功能效率提升45%。</li>
+                <li>优化导入渠道：增加百度云、夸克网盘等渠道，渠道覆盖率提升5%。</li>
+                <li>进度可视化与断点续传：新增导入进度展示和断点续传功能，提升导入效率30%。</li>
+                <li>项目结果：导入功能整体效率提升75%，但由于移动端功能覆盖度不及电脑端，后续将重点优化移动端。</li>
+              </ul>
+            </div>
+
+            <div>
+              <div class="font-semibold text-deep">“桑榆良膳”老年营养膳食小程序｜产品经理</div>
+              <div class="text-sm text-slate-500">2023.04 -- 2023.06</div>
+              <ul class="mt-2 list-disc list-inside space-y-1">
+                <li>需求挖掘与调研：通过364份问卷调研及7位营养师访谈，聚焦老年群体的饮食痛点，提炼出“定制菜谱、语音咨询、字体放大”等核心需求，输出需求分析报告并主导适老化小程序设计。</li>
+                <li>产品设计与落地：主导“首页-咨询-分享-商城”四大C端页面设计，协调技术团队实现产品原型，确保核心功能覆盖率95%。</li>
+                <li>测试与用户反馈：参与产品测试，推动12项问题修复，收集500+用户反馈，核心需求匹配度达90%，用户试用意愿达74%。</li>
+                <li>运营与成果：策划“社区+答疑”运营场景，推动10+专业营养师入驻，项目获得校级互联网+创新创业大赛优秀奖，验证了“C端需求-功能落地-资源整合”的闭环。</li>
+              </ul>
+            </div>
+
+            <div>
+              <div class="font-semibold text-deep">小红书4.4w粉账号运营｜内容产品经理</div>
+              <div class="text-sm text-slate-500">2023.12 -- 至今</div>
+              <ul class="mt-2 list-disc list-inside space-y-1">
+                <li>市场调研与账号定位：调研30+竞品账号与10+行业报告，评估赛道饱和度，确定Vlog赛道定位18-25岁学生/职场新人用户，独立搭建并运营账号。</li>
+                <li>内容设计与优化：通过分析数据和用户行为，优化Vlog内容结构（前10秒钩子+场景模块+广告位），经过3轮AB测试，封面点击率从5%提升至15%，互动率从3%增至8%。</li>
+                <li>日常运营与粉丝增长：发布650+篇笔记，制作并推广5+条万赞视频，累计获得粉丝4.4w，累计赞藏64w。</li>
+                <li>商业化与品牌合作：与vivo、OPPO等100+知名品牌合作，成功实现80+场商业合作，新增粉丝1.2w+，验证账号商业化闭环。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="border border-slate-100 rounded-xl p-6 fade-in">
+          <h3 class="text-xl font-semibold">个人技能</h3>
+          <div class="mt-4 text-slate-600 space-y-4">
+            <div>
+              <div class="font-semibold text-deep">核心技能</div>
+              <ul class="mt-2 list-disc list-inside space-y-1">
+                <li>跨团队协作与产品落地：擅长与开发、算法、运营等多方团队密切协作，推动产品功能按时上线，确保 AI 能力的规模化落地，并通过标准化文档和流程提升团队之间的协作效率。</li>
+                <li>0→1 产品设计与实现：具备强大的产品设计能力，能够从零开始设计 AI 平台和系统，包括多维度配置和计费规则引擎，显著提升运营效率，减少人工成本。</li>
+                <li>AI 平台与中后台系统：熟悉 AI 平台的设计与实现，包括算子/工作流模式的配置与自动化管理，支持大规模 AI 能力的快速落地和迭代。</li>
+                <li>模型调优与 API 集成：具有丰富的模型调优经验，能够在多模型环境中优化性能，并将 AI 模型与其他系统通过 API 高效集成。</li>
+                <li>数据分析与优化：基于数据分析驱动产品功能的持续优化，通过 A/B 测试、用户反馈和性能监控等手段，推动产品优化和迭代。</li>
+                <li>PRD 输出与产品迭代：精通撰写产品需求文档（PRD），清晰定义产品功能、设计与开发流程，推动产品的快速迭代与上线。</li>
+              </ul>
+            </div>
+            <div>
+              <div class="font-semibold text-deep">工作技能</div>
+              <div class="mt-2 flex flex-wrap gap-2 text-sm">
+                <span class="px-3 py-1 rounded-full bg-slate-100">Excel</span>
+                <span class="px-3 py-1 rounded-full bg-slate-100">SQL</span>
+                <span class="px-3 py-1 rounded-full bg-slate-100">Figma</span>
+                <span class="px-3 py-1 rounded-full bg-slate-100">Stata</span>
+                <span class="px-3 py-1 rounded-full bg-slate-100">PRD</span>
+              </div>
+              <p class="mt-3">语言能力：英语：雅思6.5、CET-6、全国学术英语词汇竞赛三等奖</p>
+              <p class="mt-1">证书：计算机二级证书、初级会计师资格证</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 fade-in">
+          <a class="px-6 py-3 border border-bright text-bright rounded-md hover:bg-bright hover:text-white transition" href="#">下载 PDF</a>
+          <span class="text-sm text-slate-500">（可替换为真实简历链接）</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="mx-auto max-w-6xl px-6 py-16 border-t border-slate-100">
+      <div class="space-y-10">
+        <div class="fade-in">
+          <div class="section-badge"><span class="icon-dot"></span> Contact</div>
+          <h2 class="text-3xl md:text-4xl font-semibold">联系方式</h2>
+        </div>
+        <div class="grid gap-8 md:grid-cols-2">
+          <div class="space-y-4 text-slate-600 fade-in">
+            <p>电话：19842364506</p>
+            <p>邮箱：<button id="copyEmail" class="text-bright hover:underline">642813058@qq.com</button></p>
+            <p>GitHub / 小红书（占位链接）</p>
+            <blockquote class="border-l-2 border-bright pl-4 text-deep">
+              希望参与 AI 平台与系统型产品建设, 持续提升结构抽象与规则设计能力
+            </blockquote>
+          </div>
+          <div class="space-y-3">
+            <div class="bg-slate-100 rounded-2xl h-40 flex items-center justify-center text-slate-400 hover:shadow-md transition fade-in">
+              社媒/二维码占位
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-slate-100 rounded-xl h-16 flex items-center justify-center text-slate-400 fade-in">GitHub 预览</div>
+              <div class="bg-slate-100 rounded-xl h-16 flex items-center justify-center text-slate-400 fade-in">小红书预览</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-100">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+        © 2026 崔茹. All rights reserved.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const counters = document.querySelectorAll('[data-count]');
+    const animateCounters = () => {
+      counters.forEach(counter => {
+        if (counter.dataset.animated) return;
+        counter.dataset.animated = 'true';
+        const target = parseInt(counter.dataset.count, 10);
+        const display = counter.dataset.display || target.toString();
+        let current = 0;
+        const step = Math.max(1, Math.floor(target / 40));
+        const tick = () => {
+          current += step;
+          if (current >= target) {
+            counter.textContent = display;
+            return;
+          }
+          counter.textContent = current;
+          requestAnimationFrame(tick);
+        };
+        tick();
+      });
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          if (entry.target.hasAttribute('data-count')) {
+            animateCounters();
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    const parallaxEls = document.querySelectorAll('[data-parallax]');
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      parallaxEls.forEach(el => {
+        const rate = parseFloat(el.dataset.parallax);
+        el.style.transform = `translateY(${y * rate * 0.08}px)`;
+      });
+    });
+
+    const copyBtn = document.getElementById('copyEmail');
+    copyBtn?.addEventListener('click', async () => {
+      const email = copyBtn.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(email);
+        copyBtn.textContent = '已复制邮箱';
+        setTimeout(() => { copyBtn.textContent = email; }, 1500);
+      } catch (_) {
+        copyBtn.textContent = '复制失败';
+        setTimeout(() => { copyBtn.textContent = email; }, 1500);
+      }
+    });
+
+    // Scroll progress and active nav
+    const progress = document.getElementById('progress');
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+    const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+    const setActive = () => {
+      const scrollPos = window.scrollY + 120;
+      let currentId = sections[0]?.id;
+      sections.forEach(sec => {
+        if (scrollPos >= sec.offsetTop) currentId = sec.id;
+      });
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${currentId}`);
+      });
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+      progress.style.width = `${percent}%`;
+    };
+    window.addEventListener('scroll', setActive);
+    window.addEventListener('load', setActive);
+  </script>
+</body>
+</html>
