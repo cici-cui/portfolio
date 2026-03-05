@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>崔茹 | AI系统与平台型产品经理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deep: '#0D3B66',
+            bright: '#7f9489'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap');
+    :root{
+      --bg: #fbfaf6;
+      --surface: #fffdf9;
+      --ink: #2e2f2b;
+      --muted: #7f857a;
+      --accent: #6f8a77;
+      --line: #efe9df;
+      --shadow: 0 10px 26px rgba(0,0,0,0.04);
+      --shadow-strong: 0 18px 40px rgba(0,0,0,0.07);
+      --radius: 18px;
+      --halo: rgba(111,138,119,0.16);
+      --halo-strong: rgba(111,138,119,0.24);
+      --transition: 260ms cubic-bezier(.2,.6,.2,1);
+    }
+
+    /* ===== 基础排版 ===== */
+    body.soft{
+      font-family: "Noto Sans SC", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 8px),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.008) 0px, rgba(0,0,0,0.008) 1px, transparent 1px, transparent 10px),
+        radial-gradient(220px 80px at 32% 18%, rgba(0,0,0,0.035), transparent 60%),
+        radial-gradient(260px 90px at 72% 22%, rgba(0,0,0,0.03), transparent 60%),
+        radial-gradient(900px 500px at 5% -10%, #ffffff 0%, transparent 55%),
+        radial-gradient(900px 500px at 110% 10%, #edf2ea 0%, transparent 60%),
+        var(--bg);
+      letter-spacing: .4px;
+      overflow-x: hidden;
+    }
+    
+
+    body.soft h1,
+    body.soft h2,
+    body.soft h3{
+      font-family: "Noto Serif SC", serif;
+      font-weight: 500;
+      letter-spacing: .06em;
+      color: #314233;
+    }
+    body.soft h1{letter-spacing: .18em;}
+    body.soft h2{letter-spacing: .12em;}
+    body.soft h3{letter-spacing: .1em;}
+    body.soft p{line-height: 1.9;}
+    body.soft .text-deep{color: var(--ink) !important;}
+    body.soft .text-bright{color: var(--accent) !important;}
+    body.soft .bg-bright{background-color: var(--accent) !important;}
+    body.soft .border-bright{border-color: var(--accent) !important;}
+    body.soft .text-slate-600{color: var(--muted) !important;}
+    body.soft .text-slate-500{color: #7f867c !important;}
+    body.soft .text-slate-400{color: #9aa199 !important;}
+    body.soft .border-slate-100{border-color: #eee7dc !important;}
+    body.soft .bg-slate-100{background: var(--surface) !important;}
+    body.soft .rounded-lg,
+    body.soft .rounded-xl,
+    body.soft .rounded-2xl{
+      box-shadow: var(--shadow);
+    }
+
+    .sticky-header{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: rgba(251,250,246,0.8);
+      backdrop-filter: blur(10px);
+    }
+    nav a{
+      position: relative;
+      padding-bottom: 2px;
+      transition: color var(--transition);
+    }
+    nav a::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform var(--transition);
+      opacity: .7;
+    }
+    nav a:hover::after{transform: scaleX(1);}
+
+    /* ===== 交互基础 ===== */
+    .btn{
+      position: relative;
+      transition: transform 260ms cubic-bezier(.16,.84,.24,1.2), box-shadow 260ms ease, background 260ms ease, color 260ms ease, border-color 260ms ease;
+      will-change: transform;
+    }
+    .btn:hover{
+      transform: translateY(-5px) scale(1.06);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.12);
+      color: #2f4b39;
+    }
+    .btn:active{
+      transform: translateY(-2px) scale(1.02);
+    }
+    .btn.bounce:active{
+      animation: btnPop 220ms ease-out;
+    }
+    @keyframes btnPop{
+      0%{transform: translateY(-2px) scale(1.02);}
+      60%{transform: translateY(-5px) scale(1.08);}
+      100%{transform: translateY(-2px) scale(1.02);}
+    }
+    .btn::before{
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: inherit;
+      background: radial-gradient(circle at 30% 30%, rgba(143,176,155,0.25), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition);
+      pointer-events: none;
+    }
+    .btn:hover::before{opacity: 1;}
+    .btn:focus-visible{
+      outline: 2px solid rgba(111,138,119,0.45);
+      outline-offset: 3px;
+    }
+    .btn-gradient{
+      background: linear-gradient(120deg, #8fb09b, #6f8a77, #8fb09b);
+      background-size: 200% 200%;
+      color: #fff !important;
+      animation: gradientShift 6s ease infinite;
+    }
+    .btn-outline{
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.7);
+    }
+    .btn-outline:hover{
+      background: linear-gradient(120deg, rgba(143,176,155,0.2), rgba(111,138,119,0.3));
+      color: #1f3a2c !important;
+      border-color: rgba(111,138,119,0.6);
+      box-shadow: inset 0 0 0 1px rgba(111,138,119,0.2);
+    }
+    .btn-outline:hover:focus-visible{
+      outline-color: rgba(111,138,119,0.65);
+    }
+    .btn-gradient:hover{background-position: 100% 50%;}
+    .btn-gradient::after{
+      content: \"\";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition);
+      pointer-events: none;
+    }
+    .btn-gradient:hover::after{opacity: 1;}
+
+    @keyframes gradientShift{
+      0%{background-position: 0% 50%}
+      50%{background-position: 100% 50%}
+      100%{background-position: 0% 50%}
+    }
+
+    .project-card{
+      transition: transform 520ms cubic-bezier(.16,.84,.24,1), box-shadow 520ms ease, border-color 520ms ease, background-color 520ms ease;
+      position: relative;
+    }
+    .project-card:hover{
+      border-color: rgba(111,138,119,0.35);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.1);
+      transform: translateY(-5px);
+    }
+    .project-card:hover *{
+      color: inherit;
+    }
+
+    .card-glow{
+      position: relative;
+    }
+    .card-glow::before,
+    .card-glow::after{
+      content: "";
+      position: absolute;
+      inset: -34px;
+      border-radius: 60px;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 520ms ease, transform 520ms ease;
+      pointer-events: none;
+    }
+    .card-glow::before{
+      background:
+        radial-gradient(120% 90% at 20% 8%, rgba(111,138,119,0.22), transparent 85%),
+        radial-gradient(110% 95% at 85% 95%, rgba(143,176,155,0.18), transparent 86%);
+      filter: blur(36px);
+    }
+    .card-glow::after{
+      inset: -24px;
+      border-radius: 52px;
+      background: radial-gradient(140% 140% at 50% 50%, rgba(111,138,119,0.14), transparent 78%);
+      filter: blur(28px);
+    }
+    .card-glow:hover::after{
+      opacity: .75;
+      transform: scale(1.02);
+    }
+    .card-glow:hover::before{
+      opacity: .8;
+      transform: scale(1.01);
+    }
+    .image-tilt{
+      transition: transform 260ms ease;
+      transform-style: preserve-3d;
+    }
+    .image-hover:hover .image-tilt{
+      transform: scale(1.05) rotate(-1deg);
+    }
+
+    /* 顶部进度条 */
+    .scroll-progress{
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #9bb3a0, #6f8a77);
+      z-index: 60;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .image-hover{
+      position: relative;
+      overflow: hidden;
+    }
+    .image-hover::after{
+      content: attr(data-overlay);
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      color: #fff;
+      font-size: 14px;
+      background: rgba(0,0,0,0);
+      opacity: 0;
+      transition: opacity var(--transition), background var(--transition);
+      pointer-events: none;
+    }
+    .image-hover:hover::after{
+      opacity: 0;
+      background: rgba(0,0,0,0);
+    }
+    .image-hover > div,
+    .image-hover > img{
+      transform: scale(1);
+      transition: transform 400ms ease;
+    }
+    .image-hover:hover > div,
+    .image-hover:hover > img{
+      transform: scale(1.06);
+    }
+
+    .reveal{
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+    .reveal.in{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal .stagger{
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+    .reveal.in .stagger{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 轻微视差背景 */
+    .parallax{
+      position: relative;
+      overflow: hidden;
+    }
+    .parallax::before{
+      content: "";
+      position: absolute;
+      inset: -20% -10% auto -10%;
+      height: 140%;
+      background: radial-gradient(400px 240px at 20% 10%, rgba(255,255,255,.8), transparent 60%),
+                  radial-gradient(520px 260px at 90% 0%, rgba(214,227,214,.6), transparent 60%);
+      transform: translateY(var(--parallax, 0));
+      transition: transform 60ms linear;
+      pointer-events: none;
+    }
+
+    /* 图标 hover 旋转/变色 */
+    .icon-hover{
+      transition: transform var(--transition), color var(--transition);
+    }
+    .icon-hover:hover{
+      transform: rotate(-8deg) scale(1.06);
+      color: var(--accent);
+    }
+
+    /* 汉堡菜单动画 */
+    .menu-btn{
+      display: none;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .menu-btn:hover{transform: translateY(-1px); box-shadow: var(--shadow);}
+    .menu-btn span,
+    .menu-btn span::before,
+    .menu-btn span::after{
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--ink);
+      transition: transform var(--transition), opacity var(--transition);
+      content: "";
+    }
+    .menu-btn span{position: relative;}
+    .menu-btn span::before{position: absolute; top: -6px;}
+    .menu-btn span::after{position: absolute; top: 6px;}
+    .menu-btn.active span{transform: rotate(45deg);}
+    .menu-btn.active span::before{transform: rotate(90deg) translateX(6px);}
+    .menu-btn.active span::after{opacity: 0;}
+
+    /* 绿色箭头光标 */
+    body{cursor: none;}
+    a, button, .btn{cursor: none;}
+    .cursor-dot{
+      position: fixed;
+      width: 18px;
+      height: 22px;
+      border-radius: 0;
+      background: transparent;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 80;
+      opacity: .95;
+      transition: transform 140ms ease;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='22' viewBox='0 0 18 22' fill='none'><path d='M2 1L14 13L9.5 13.2L12.8 21L10.6 22L7.4 14.3L3.8 17.4L2 1Z' fill='%236f8a77'/></svg>");
+      background-size: 18px 22px;
+      background-repeat: no-repeat;
+    }
+    body.cursor-press .cursor-dot{
+      transform: translate(-50%, -50%) scale(0.92);
+      filter: drop-shadow(0 0 6px rgba(111,138,119,0.35));
+    }
+    body.cursor-press .cursor-dot{
+      transform: translate(-50%, -50%) scale(0.9) rotate(-8deg);
+      filter: drop-shadow(0 0 6px rgba(111,138,119,0.35));
+    }
+    body.cursor-release .cursor-dot{
+      animation: cursorBounce 220ms ease-out;
+    }
+    @keyframes cursorBounce{
+      0%{transform: translate(-50%, -50%) scale(0.9) rotate(-8deg);}
+      60%{transform: translate(-50%, -50%) scale(1.08) rotate(6deg);}
+      100%{transform: translate(-50%, -50%) scale(1) rotate(0deg);}
+    }
+    .cursor-ripple{
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(111,138,119,0.45);
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.4);
+      opacity: 0.8;
+      z-index: 79;
+      animation: ripple 520ms ease-out forwards;
+    }
+    @keyframes ripple{
+      0%{transform: translate(-50%, -50%) scale(0.4); opacity: .8;}
+      100%{transform: translate(-50%, -50%) scale(3.8); opacity: 0;}
+    }
+
+
+    /* 细节：柔和色块与非等高图像占位 */
+    .tint-1{background: #f6f3ed !important;}
+    .tint-2{background: #eef3ee !important;}
+    .tint-3{background: #f5f3ef !important;}
+    .ratio-3x4{height: 220px;}
+    .ratio-4x3{height: 180px;}
+    .ratio-16x9{height: 160px;}
+    .ratio-tall{height: 260px;}
+    .thumb-preview{
+      width: 120px;
+      height: 78px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.4)),
+        #e6ebe4;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb-preview img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .preview-full{
+      width: calc(100% - 28px);
+      height: calc(100% - 28px);
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      background: #ffffff;
+    }
+    .preview-mock{
+      width: calc(100% - 28px);
+      height: calc(100% - 28px);
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .preview-mock.gradient{
+      background:
+        radial-gradient(200px 120px at 20% 20%, rgba(143,176,155,0.35), transparent 60%),
+        radial-gradient(220px 140px at 80% 30%, rgba(214,227,214,0.35), transparent 60%),
+        linear-gradient(135deg, #f5f7f2 0%, #eef2ec 100%);
+      border: none;
+    }
+    .preview-mock.wireframe{
+      background:
+        linear-gradient(0deg, rgba(0,0,0,0.04), rgba(0,0,0,0.04)) top/100% 28px no-repeat,
+        linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.04)) left/28% 100% no-repeat,
+        linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.04)) right/28% 100% no-repeat,
+        #ffffff;
+    }
+
+    /* 小标题装饰线 */
+    .title-line{
+      position: relative;
+      display: inline-block;
+      padding-bottom: 8px;
+    }
+    .title-line::after{
+      content: \"\";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 56px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      transform: translateX(-50%);
+      opacity: .5;
+    }
+
+    /* 纸感微纹理 */
+    .paper{
+      background:
+        linear-gradient(0deg, rgba(255,255,255,0.75), rgba(255,255,255,0.75)),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 6px),
+        var(--surface) !important;
+    }
+
+    /* 审美与设计：卡片 / 日历 / 胶片 */
+    .aesthetic-grid{
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+    .a-card{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .a-card .label{
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #8b8b8b;
+    }
+    .a-title{
+      font-size: 16px;
+      margin: 6px 0 0;
+      color: #3a4a3a;
+      font-family: "Noto Serif SC", serif;
+    }
+    .a-muted{color: var(--muted); font-size: 12px;}
+
+    .film{
+      grid-column: span 7;
+      padding: 18px;
+    }
+    .film-strip{
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f5f2ec;
+    }
+    .film-row{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .film-frame{
+      height: 110px;
+      border-radius: 10px;
+      background: #e7e2d8;
+      position: relative;
+      overflow: hidden;
+    }
+    .film-frame::after{
+      content: "";
+      position: absolute;
+      inset: 6px 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 6px;
+    }
+
+    .calendar{
+      grid-column: span 5;
+      padding: 18px;
+    }
+    .calendar-head{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .calendar-grid{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      font-size: 11px;
+      color: #8a8a8a;
+    }
+    .calendar-cell{
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 6px;
+      background: #f7f4ee;
+      text-align: center;
+    }
+    .calendar-cell.active{
+      background: #e9f0ea;
+      color: #5d7a66;
+      font-weight: 600;
+    }
+
+    .mini-cards{
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .mini-card{
+      padding: 16px;
+    }
+    .mini-thumb{
+      height: 120px;
+      border-radius: 10px;
+      background: #e9e5dc;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 980px){
+      .film{grid-column: span 12;}
+      .calendar{grid-column: span 12;}
+      .mini-cards{grid-template-columns: 1fr;}
+    }
+
+    /* 项目案例：胶卷横向滚动 */
+    .film-scroll{
+      display: flex;
+      gap: 18px;
+      overflow-x: scroll;
+      padding: 18px 8px 24px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(111,138,119,0.35) rgba(0,0,0,0.04);
+      max-width: 100%;
+    }
+    .film-scroll::-webkit-scrollbar{height: 8px;}
+    .film-scroll::-webkit-scrollbar-thumb{
+      background: rgba(111,138,119,0.25);
+      border-radius: 999px;
+    }
+    .film-scroll::-webkit-scrollbar-track{
+      background: rgba(0,0,0,0.04);
+      border-radius: 999px;
+    }
+    .film-scroll .project-card{
+      min-width: 320px;
+      max-width: 360px;
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+    .film-strip-frame{
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        radial-gradient(320px 160px at 20% 0%, rgba(255,255,255,0.75), transparent 60%),
+        radial-gradient(360px 180px at 85% 10%, rgba(214,227,214,0.4), transparent 60%),
+        linear-gradient(180deg, #f7f8f4 0%, #f1f4ef 100%);
+      padding: 12px 10px;
+    }
+
+    /* 线性图标风格 */
+    .icon{
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform var(--transition), color var(--transition);
+    }
+    .icon:hover{
+      transform: rotate(-16deg) scale(1.12);
+      color: var(--accent);
+    }
+
+    .mode-toggle{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .mode-toggle:hover{transform: translateY(-1px); box-shadow: var(--shadow);}
+
+    /* 响应式 */
+    @media (max-width: 900px){
+      body{cursor: auto;}
+      .cursor-dot{display:none;}
+    }
+    @media (max-width: 720px){
+      nav{display:none;}
+      nav.mobile-open{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: absolute;
+        right: 24px;
+        top: 68px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        padding: 12px 14px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        z-index: 10;
+      }
+      .menu-btn{display:flex;}
+    }
+
+    /* 16:9 幻灯片框 */
+    .slide{
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 48px 52px;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+    }
+    .slide:hover{
+      box-shadow: 0 22px 46px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+      transition: transform 260ms ease, box-shadow 260ms ease;
+    }
+    .slide > .slide-inner{width:100%;}
+    @media (max-width: 1024px){
+      .slide{aspect-ratio: auto;}
+    }
+
+    /* 单列极简分割线 */
+    .divider{
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(111,138,119,0.35), transparent);
+      margin: 28px 0;
+    }
+    .hero-simple{
+      display: grid;
+      gap: 18px;
+    }
+    .hero-simple .headline{
+      font-size: clamp(28px, 3.6vw, 42px);
+      letter-spacing: .02em;
+      color: #2b3a2f;
+    }
+    .hero-simple .subhead{
+      font-size: clamp(18px, 2.2vw, 26px);
+      color: var(--muted);
+    }
+    .hero-photo{
+      width: 82%;
+      max-width: 300px;
+      border-radius: 24px;
+      object-fit: cover;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+    }
+    .hero-photo-area{
+      width: 98%;
+      max-width: 380px;
+      padding: 18px;
+      border-radius: 24px;
+      background: #e6ede6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .section-compact{
+      padding-top: 36px !important;
+      padding-bottom: 36px !important;
+    }
+
+    /* 时间轴细节 */
+    .timeline-item{
+      padding-left: 16px;
+    }
+    .timeline-dot{
+      position: absolute;
+      left: -8px;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(111,138,119,0.15);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .timeline-year{
+      font-size: 14px;
+      letter-spacing: .08em;
+      color: #5c6c5e;
+    }
+    .timeline-item:hover .timeline-dot{
+      transform: scale(1.2);
+      box-shadow: 0 0 0 6px rgba(111,138,119,0.22);
+    }
+    .timeline-item{
+      opacity: 1;
+      transform: none;
+    }
+    .edu-right{
+      opacity: 1;
+      transform: none;
+    }
+
+    /* 明显版排版控制 */
+    .hero-title{
+      font-size: clamp(44px, 7.2vw, 96px);
+      line-height: 1.02;
+      letter-spacing: .22em;
+    }
+    .hero-kicker{
+      letter-spacing: .22em;
+    }
+    .section-air{
+      padding-top: 88px !important;
+      padding-bottom: 88px !important;
+    }
+    .section-air-tight{
+      padding-top: 72px !important;
+      padding-bottom: 72px !important;
+    }
+    .grid-air{
+      gap: 32px !important;
+    }
+    .card-air{
+      padding: 28px !important;
+    }
+    .film-strong{
+      background: #edf2ea !important;
+      border-color: #dfe6dc !important;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    }
+    .film-strong .label,
+    .film-strong .a-muted{
+      color: #6f8a77 !important;
+    }
+    .film-strong .a-title{
+      color: #2f4b39 !important;
+    }
+    .film-strong .film-strip{
+      background: #e3ebdf !important;
+    }
+    .film-strong .film-frame{
+      background: #dbe6d7 !important;
+    }
+  </style>
+</head>
+<body class="soft bg-white text-deep font-sans">
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="scroll-progress" id="scrollProgress"></div>
+  <!-- Page Container -->
+  <div class="min-h-screen relative z-10">
+    <!-- Navigation -->
+    <header class="border-b border-slate-100 parallax sticky-header" data-parallax>
+      <div class="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div class="text-lg font-semibold tracking-wide">CICI</div>
+        <nav class="flex flex-wrap gap-4 text-sm text-slate-600" id="nav">
+          <a class="hover:text-deep" href="#intro">Home</a>
+          <a class="hover:text-deep" href="#education">Education</a>
+          <a class="hover:text-deep" href="#skills">Skills</a>
+          <a class="hover:text-deep" href="#projects">Projects</a>
+          <a class="hover:text-deep" href="#cta">Contact</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <button class="menu-btn" id="menuBtn" aria-label="打开菜单"><span></span></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="mx-auto max-w-6xl px-6 py-16 section-compact reveal" id="intro">
+      <div class="slide parallax" data-parallax>
+        <div class="slide-inner grid gap-10 md:grid-cols-2 items-center">
+        <div class="rounded-lg h-64 md:h-80 flex items-center justify-center image-hover" data-overlay="简历半身照" style="background: transparent; box-shadow: none;">
+          <div class="hero-photo-area">
+            <img class="hero-photo" src="assets/简历半身照.jpg" alt="简历半身照" />
+          </div>
+        </div>
+        <div class="space-y-6">
+          <p class="text-sm uppercase tracking-widest text-slate-400 hero-kicker">Portfolio · CICI</p>
+          <h1 class="font-semibold text-deep hero-title" style="font-size: clamp(36px, 6vw, 72px);">崔茹</h1>
+          <p class="text-lg text-slate-400">27届应届生 | AI 与产品研究 | 内容创作者</p>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            <span class="block">我探索用户行为与产品体验，</span>
+            <span class="block">通过 AI 工具、数据分析和系统化方法，</span>
+            <span class="block">将复杂问题抽象为可落地方案。</span>
+          </p>
+          <div class="flex flex-wrap gap-2 text-sm text-slate-600">
+            <span class="px-3 py-1 border border-slate-200 rounded-full">AI 平台设计</span>
+            <span class="px-3 py-1 border border-slate-200 rounded-full">ToC 用户洞察</span>
+            <span class="px-3 py-1 border border-slate-200 rounded-full">内容产品运营</span>
+            <span class="px-3 py-1 border border-slate-200 rounded-full">数据驱动优化</span>
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <a class="px-6 py-3 border border-bright text-bright rounded-md transition btn btn-outline bounce" href="#projects">View Work</a>
+            <a class="px-6 py-3 border border-bright text-bright rounded-md transition btn btn-outline bounce" href="#cta">Contact Me</a>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="mx-auto max-w-6xl px-6 py-10 section-compact reveal" id="education">
+      <div class="slide">
+        <div class="slide-inner">
+          <h2 class="text-2xl font-semibold mb-8 title-line">教育经历</h2>
+          <div class="grid gap-10 md:grid-cols-2 items-start grid-air">
+        <div class="relative pl-10">
+          <div class="absolute left-3 top-1 bottom-1 w-px bg-slate-200"></div>
+          <div class="space-y-8 text-slate-600 leading-relaxed">
+            <div class="relative timeline-item">
+              <span class="timeline-dot"></span>
+              <p class="timeline-year">2025.09 — 2027.06</p>
+            </div>
+            <div class="relative timeline-item">
+              <span class="timeline-dot"></span>
+              <p class="timeline-year">2021.09 — 2025.06</p>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-4 text-slate-600 leading-relaxed edu-right">
+          <p>华南师范大学（211）｜会计｜硕士</p>
+          <p>华南师范大学（211）｜财务管理｜本科</p>
+        </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skill System -->
+    <section class="mx-auto max-w-6xl px-6 py-10 section-compact reveal" id="skills">
+      <div class="slide">
+        <div class="slide-inner">
+          <h2 class="text-2xl font-semibold mb-8 title-line">能力体系</h2>
+          <div class="grid gap-4 md:grid-cols-2">
+        <a class="border border-slate-100 rounded-lg p-6 card-air hover:shadow-md hover:-translate-y-1 transition bg-white" href="#work-ai-platform">
+          <svg class="icon mb-3" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v4m0 10v4M3 12h4m10 0h4"></path>
+            <path d="M7 7h10v10H7z"></path>
+          </svg>
+          <h3 class="font-semibold">AI 平台设计</h3>
+          <p class="text-slate-600 mt-2">多维度 SKU 自动化配置系统 &amp; 规则引擎</p>
+        </a>
+        <a class="border border-slate-100 rounded-lg p-6 card-air hover:shadow-md hover:-translate-y-1 transition bg-white" href="#work-user">
+          <svg class="icon mb-3" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+          <h3 class="font-semibold">ToC 用户洞察</h3>
+          <p class="text-slate-600 mt-2">用户需求分析、搭建生活化软件、调研与优化</p>
+        </a>
+        <a class="border border-slate-100 rounded-lg p-6 card-air hover:shadow-md hover:-translate-y-1 transition bg-white" href="#work-content">
+          <svg class="icon mb-3" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+            <path d="M7 5l2 4M12 5l2 4M17 5l2 4"></path>
+          </svg>
+          <h3 class="font-semibold">内容产品运营</h3>
+          <p class="text-slate-600 mt-2">小红书 Vlog 内容策略、增长闭环</p>
+        </a>
+        <a class="border border-slate-100 rounded-lg p-6 card-air hover:shadow-md hover:-translate-y-1 transition bg-white" href="#insights">
+          <svg class="icon mb-3" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 18h16"></path>
+            <path d="M6 15l4-4 3 3 5-6"></path>
+          </svg>
+          <h3 class="font-semibold">数据驱动优化</h3>
+          <p class="text-slate-600 mt-2">数据分析、A/B 测试、功能优化</p>
+        </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="mx-auto max-w-6xl px-6 py-12 section-compact space-y-12 reveal" id="projects">
+      <!-- Project Cards -->
+      <div class="film-strip-frame">
+        <div class="mb-4 px-2 text-center">
+          <p class="text-xs uppercase tracking-widest text-slate-400">Projects & Cases</p>
+          <h2 class="text-xl md:text-2xl font-semibold mt-2">项目与案例</h2>
+          <p class="text-slate-600 mt-2">探索 AI 平台、用户研究、内容产品与场景化设计</p>
+        </div>
+      <div class="film-scroll">
+        <article id="work-ai-platform" class="project-card card-glow border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition image-hover" data-category="ai-platform" data-overlay="AI 平台与 ToB 系统设计">
+          <div class="ratio-4x3 tint-1 flex items-center justify-center image-tilt">
+            <img class="preview-full" src="assets/成本配置.png" alt="成本配置预览" />
+          </div>
+          <div class="p-6 card-air space-y-3 paper">
+            <div class="text-sm text-slate-500">万兴科技 | AI 产品策划经理 | 2026.01 – 2026.04</div>
+            <h3 class="text-xl font-semibold">AI 平台与 ToB 系统设计</h3>
+            <p class="text-slate-600">多维度 SKU 自动化配置系统 &amp; 规则引擎</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>提升操作效率 80%，显著降低人工成本</li>
+              <li>协调开发/算法/运营团队，实现功能按时上线</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-ai-platform">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-user" class="project-card card-glow border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition image-hover" data-category="toc" data-overlay="用户洞察与 ToC 产品">
+          <div class="ratio-3x4 tint-2 flex items-center justify-center image-tilt">
+            <img class="preview-full" src="assets/冰箱.png" alt="智能冰箱管理界面预览" />
+          </div>
+          <div class="p-6 card-air space-y-3 paper">
+            <div class="text-sm text-slate-500">智能冰箱管理网站 | AI 产品经理 | 个人项目 | 2025.08 – 2025.12</div>
+            <h3 class="text-xl font-semibold">用户洞察与 ToC 产品</h3>
+            <p class="text-slate-600">AI 算法智能提醒与个性化推荐，提高食材管理效率</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>独立完成产品规划、原型设计与前端功能实现</li>
+              <li>收集用户数据并持续优化功能，迭代满足需求</li>
+              <li>跟踪竞品与生活类应用趋势，优化产品策略</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-user">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-content" class="project-card card-glow border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition image-hover" data-category="content" data-overlay="内容产品运营">
+          <div class="ratio-16x9 tint-3 flex items-center justify-center image-tilt">
+            <img class="preview-full" src="assets/小红书.png" alt="小红书内容预览" />
+          </div>
+          <div class="p-6 card-air space-y-3 paper">
+            <div class="text-sm text-slate-500">小红书内容产品 | 内容产品经理 | 2023.12 – 至今</div>
+            <h3 class="text-xl font-semibold">内容产品运营</h3>
+            <p class="text-slate-600">内容结构优化 + 数据分析，构建商业闭环</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>发布 650+ 篇笔记，粉丝 4.4w，互动率 3% → 8%</li>
+              <li>与 100+ 品牌合作，实现 80+ 商业合作</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-content">查看详情 →</a>
+          </div>
+        </article>
+
+        <article id="work-home" class="project-card card-glow border border-slate-100 rounded-xl overflow-hidden bg-white hover:shadow-md hover:-translate-y-1 transition image-hover" data-category="aesthetic" data-overlay="设计与审美表达">
+          <div class="ratio-tall tint-2 flex items-center justify-center image-tilt">
+            <img class="preview-full" src="assets/4.jpg" alt="设计与审美表达预览" />
+          </div>
+          <div class="p-6 card-air space-y-3 paper">
+            <div class="text-sm text-slate-500">家居场景化产品定制 | 产品经理 | 2025.06 – 2025.11</div>
+            <h3 class="text-xl font-semibold">设计与审美表达</h3>
+            <p class="text-slate-600">用户深访 + 定制场景设计</p>
+            <ul class="text-slate-600 space-y-1">
+              <li>协调施工 / 材料 / 智能设备团队落地</li>
+              <li>用户满意度 92%，智能设备适配率 98%</li>
+            </ul>
+            <a class="inline-flex items-center text-bright text-sm" href="#work-home">查看详情 →</a>
+          </div>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="mx-auto max-w-6xl px-6 py-12 section-compact reveal" id="cta">
+      <div class="slide parallax" data-parallax>
+        <div class="slide-inner">
+        <h2 class="text-2xl font-semibold title-line">想了解更多我的研究项目和笔记？</h2>
+        <p class="text-slate-600 mt-2">欢迎查看作品与洞察，也可以直接联系我。</p>
+        <div class="flex flex-wrap gap-4 mt-6">
+          <a class="px-6 py-3 rounded-md btn btn-gradient bounce" href="#projects">View Work</a>
+          <a class="px-6 py-3 border border-bright text-bright rounded-md transition btn btn-outline bounce" href="#contact">Contact Me</a>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-6xl px-6 py-12 section-compact reveal" id="contact">
+      <div class="slide">
+        <div class="slide-inner space-y-8">
+        <div>
+          <p class="text-sm uppercase tracking-widest text-slate-400">Let's Connect</p>
+          <h2 class="text-2xl md:text-3xl font-semibold mt-2 title-line">联系我</h2>
+        </div>
+        <div class="grid gap-3 text-slate-600">
+          <div class="flex items-center gap-3">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16v12H4z"></path>
+              <path d="M4 7l8 6 8-6"></path>
+            </svg>
+            <span>642813058@qq.com</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5c6 9 10 12 15 15l1-1c1-1 1-3 0-4l-2-2-3 1-3-3 1-3-2-2c-1-1-3-1-4 0z"></path>
+            </svg>
+            <span>19842364506</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <span class="text-slate-600">想了解更多？来聊聊吧！</span>
+          <div class="flex flex-wrap gap-3 justify-end">
+            <a class="px-4 py-2 text-sm rounded-md btn btn-gradient bounce" href="mailto:642813058@qq.com">Say Hi</a>
+            <a class="px-4 py-2 text-sm border border-bright text-bright rounded-md transition btn btn-outline bounce" href="mailto:642813058@qq.com">Contact Me</a>
+            <a class="px-4 py-2 text-sm border border-bright text-bright rounded-md transition btn btn-outline bounce" href="mailto:642813058@qq.com">Send a Message</a>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+
+      <!-- Footer -->
+      <footer class="border-t border-slate-100 mt-10">
+        <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-400">
+          © 2026 崔茹. All rights reserved.
+        </div>
+      </footer>
+  </div>
+  <!-- 全屏原型预览 -->
+  <div id="prototypeModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50">
+    <div class="absolute inset-4 md:inset-10 bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-2xl">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white">
+        <div class="text-sm text-slate-600">智能冰箱管理网站 · 原型预览</div>
+        <button id="closePrototype" class="px-3 py-1 border border-slate-200 rounded-md text-slate-600 hover:text-slate-900">关闭</button>
+      </div>
+      <iframe id="prototypeFrame" src="v5.html" title="智能冰箱管理网站原型" style="width:100%;height:calc(100% - 48px);border:0;"></iframe>
+    </div>
+  </div>
+  <script>
+    // 分类筛选
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+    const setActive = (btn) => {
+      filterButtons.forEach(b => b.classList.remove('border-bright', 'text-bright'));
+      btn.classList.add('border-bright', 'text-bright');
+    };
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+        setActive(btn);
+        projectCards.forEach(card => {
+          const show = filter === 'all' || card.dataset.category === filter;
+          card.classList.toggle('hidden', !show);
+        });
+      });
+    });
+    if (filterButtons.length) setActive(filterButtons[0]);
+
+    // 汉堡菜单
+    const menuBtn = document.getElementById('menuBtn');
+    const nav = document.getElementById('nav');
+    menuBtn.addEventListener('click', () => {
+      nav.classList.toggle('mobile-open');
+      menuBtn.classList.toggle('active');
+    });
+
+    // 滚动淡入
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('in');
+        const staggerItems = entry.target.querySelectorAll('.project-card, .a-card, .mini-card, .filter-btn, .btn, .icon, .image-hover');
+        let delay = 0;
+        staggerItems.forEach(el => {
+          el.classList.add('stagger');
+          el.style.transitionDelay = `${delay}ms`;
+          delay += 60;
+        });
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 视差
+    const parallaxEls = document.querySelectorAll('[data-parallax]');
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      parallaxEls.forEach(el => {
+        el.style.setProperty('--parallax', `${y * 0.06}px`);
+      });
+    });
+
+    // 滚动进度条
+    const scrollProgress = document.getElementById('scrollProgress');
+    window.addEventListener('scroll', () => {
+      const doc = document.documentElement;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const progress = total ? (doc.scrollTop / total) * 100 : 0;
+      scrollProgress.style.width = `${progress}%`;
+    });
+
+    // 极简鼠标光标
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorOffsetX = 6;
+    const cursorOffsetY = 10;
+    window.addEventListener('mousemove', (e) => {
+      if (!cursorDot) return;
+      cursorDot.style.left = `${e.clientX + cursorOffsetX}px`;
+      cursorDot.style.top = `${e.clientY + cursorOffsetY}px`;
+    });
+
+    // 点击态光标（旋转 + 回弹）
+    window.addEventListener('mousedown', () => {
+      document.body.classList.add('cursor-press');
+      document.body.classList.remove('cursor-release');
+    });
+    window.addEventListener('mouseup', () => {
+      document.body.classList.remove('cursor-press');
+      document.body.classList.add('cursor-release');
+      setTimeout(() => document.body.classList.remove('cursor-release'), 240);
+    });
+
+    // 点击波纹（从箭头尖尖开始）
+    window.addEventListener('mousedown', (e) => {
+      const ripple = document.createElement('div');
+      ripple.className = 'cursor-ripple';
+      // 箭头尖位置相对光标中心的偏移
+      const tipOffsetX = -6;
+      const tipOffsetY = -8;
+      ripple.style.left = `${e.clientX + cursorOffsetX + tipOffsetX}px`;
+      ripple.style.top = `${e.clientY + cursorOffsetY + tipOffsetY}px`;
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+
+    // 横向胶卷区：鼠标滚轮驱动横向滚动
+
+
+
+    // 胶卷卡片：悬停居中
+    const filmScroll = document.querySelector('.film-scroll');
+    const centerCard = (card) => {
+      if (!filmScroll || !card) return;
+      const left = card.offsetLeft - (filmScroll.clientWidth / 2) + (card.offsetWidth / 2);
+      filmScroll.scrollTo({ left, behavior: 'smooth' });
+    };
+    filmScroll?.querySelectorAll('.project-card').forEach((card) => {
+      card.addEventListener('mouseenter', () => centerCard(card));
+    });
+
+
+    // 全屏原型弹窗
+    const prototypeModal = document.getElementById('prototypeModal');
+    const prototypeFrame = document.getElementById('prototypeFrame');
+    document.querySelectorAll('#work-user, #work-ai-platform').forEach(card => {
+      card.addEventListener('click', () => {
+        prototypeModal.classList.remove('hidden');
+        prototypeFrame.src = card.id === 'work-ai-platform' ? 'assets/cost-config2.html' : 'v5.html';
+      });
+    });
+    document.getElementById('closePrototype').addEventListener('click', () => {
+      prototypeModal.classList.add('hidden');
+    });
+    prototypeModal.addEventListener('click', (e) => {
+      if (e.target === prototypeModal) prototypeModal.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
